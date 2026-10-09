@@ -16,9 +16,7 @@ import android.widget.Toolbar;
 @SuppressWarnings("deprecation") // Platform fragment avoids depending on Twitch's obfuscated AndroidX router.
 public final class PatchSettingsPage extends DialogFragment {
     static final String TAG = "twitch_patches_settings";
-    private String groupKey;
-    private boolean directGroup;
-    private int rootScroll;
+    private SettingsNavigation navigation;
     private LinearLayout contents;
     private ScrollView scroll;
     private Toolbar toolbar;
@@ -34,14 +32,9 @@ public final class PatchSettingsPage extends DialogFragment {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         setStyle(STYLE_NO_TITLE, 0);
-        if (state != null) {
-            groupKey = state.getString("group");
-            rootScroll = state.getInt("root_scroll");
-            directGroup = state.getBoolean("direct_group");
-        } else if (getArguments() != null) {
-            groupKey = getArguments().getString("group");
-            directGroup = groupKey != null;
-        }
+        if (state != null && state.containsKey("routes") && state.containsKey("offsets")) {
+            navigation = new SettingsNavigation(state.getStringArrayList("routes"), state.getIntegerArrayList("offsets"));
+        } else navigation = new SettingsNavigation(getArguments() == null ? null : getArguments().getString("group"));
     }
 
     @Override public Dialog onCreateDialog(Bundle state) {
@@ -69,19 +62,18 @@ public final class PatchSettingsPage extends DialogFragment {
         scroll.addView(contents, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         page.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        restoreScroll();
         return page;
     }
 
     private void open(SettingGroup group) {
-        rootScroll = scroll.getScrollY();
-        groupKey = group.key();
+        navigation.open(group.key(), scroll.getScrollY());
         renderPage();
         scroll.scrollTo(0, 0);
     }
 
     private void renderPage() {
-        SettingGroup group = PatchSettings.group(groupKey);
-        if (group == null) groupKey = null;
+        SettingGroup group = PatchSettings.group(navigation.current());
         toolbar.setTitle(group == null ? "Patch settings" : group.title());
         contents.removeAllViews();
         TwitchSettingsRows.populate(contents, group == null ? PatchSettings.options() : group.children(), this::open, group == null);
@@ -90,17 +82,25 @@ public final class PatchSettingsPage extends DialogFragment {
     }
 
     private void back() {
-        if (groupKey == null || directGroup) { closePage(); return; }
-        groupKey = null;
+        if (!navigation.back()) { closePage(); return; }
         renderPage();
-        scroll.post(() -> { if (scroll != null) scroll.scrollTo(0, rootScroll); });
+        restoreScroll();
+    }
+
+    private void restoreScroll() {
+        int offset = navigation.scroll();
+        String route = navigation.current();
+        ScrollView target = scroll;
+        target.post(() -> {
+            if (scroll == target && java.util.Objects.equals(route, navigation.current())) target.scrollTo(0, offset);
+        });
     }
 
     @Override public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putString("group", groupKey);
-        state.putInt("root_scroll", rootScroll);
-        state.putBoolean("direct_group", directGroup);
+        if (scroll != null) navigation.saveScroll(scroll.getScrollY());
+        state.putStringArrayList("routes", navigation.routes());
+        state.putIntegerArrayList("offsets", navigation.offsets());
     }
 
     @Override public void onDestroyView() {

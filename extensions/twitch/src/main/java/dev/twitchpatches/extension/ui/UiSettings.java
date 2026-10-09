@@ -4,8 +4,8 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import dev.twitchpatches.extension.settings.PatchSettings;
 import dev.twitchpatches.extension.settings.SettingGroup;
+import dev.twitchpatches.extension.settings.SettingEntry;
 import dev.twitchpatches.extension.settings.SettingSection;
-import dev.twitchpatches.extension.settings.ToggleSetting;
 import dev.twitchpatches.extension.shared.ReactNativeRuntime;
 import java.util.List;
 import org.json.JSONObject;
@@ -14,6 +14,7 @@ public final class UiSettings implements SettingGroup {
     public static final String KEY = "ui_settings";
     private static volatile UiSettings instance;
     private final UiFeatureRegistry features;
+    private final List<SettingEntry> categories;
 
     private UiSettings(Application application) {
         SharedPreferences preferences = application.getSharedPreferences("twitch_patches_ui", 0);
@@ -23,21 +24,17 @@ public final class UiSettings implements SettingGroup {
                 preferences.edit().putBoolean(key, enabled).apply();
             }
         });
-        features.observe(ReactNativeRuntime::refresh);
+        categories = UiOptions.create(features);
+        features.observe(() -> { ReactNativeRuntime.refresh(); UiComposeBridge.update(); });
     }
 
     public static synchronized void initialize(Application application) {
         if (instance != null) return;
         instance = new UiSettings(application);
+        UiComposeBridge.update();
+        UiFullscreenPolicy.initialize(application);
         ReactNativeRuntime.select(7);
         PatchSettings.register(instance);
-    }
-
-    public static ToggleSetting register(String key, String title, String summary) {
-        UiSettings settings = requireInstance();
-        ToggleSetting option = settings.features.register(key, title, summary);
-        ReactNativeRuntime.refresh();
-        return option;
     }
 
     public static boolean enabled(String key) {
@@ -71,5 +68,5 @@ public final class UiSettings implements SettingGroup {
     @Override public String summary() { return "Customize the Twitch interface."; }
     @Override public String emptyMessage() { return "No UI options are available in this build."; }
     @Override public SettingSection section() { return SettingSection.INTERFACE; }
-    @Override public List<ToggleSetting> children() { return features.options(); }
+    @Override public List<SettingEntry> children() { return categories; }
 }

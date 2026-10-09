@@ -15,7 +15,7 @@ Select each feature independently when patching. Included features appear under 
 | Auto-claim bonus channel points | Automatically claims bonus channel points while watching live streams. |
 | BTTV, FFZ and 7TV emotes | Adds global and channel emotes to chat and the emote picker, with animations, provider settings and tap previews. |
 | Reload stream | Reloads live streams with a double-tap control. |
-| UI settings | Adds a shared settings page for interface customization. Individual options will be added in later updates. |
+| UI settings | Controls the visibility of player buttons, channel actions and fullscreen system bars. |
 | Block client-requested ads | Blocks native player ad requests. Restart Twitch after changing this setting. |
 | Playback diagnostics | Records playlist metadata and playback counters for troubleshooting. |
 | Inspect Twitch APK | Reports the APK package, version and DEX class count without modifying the app. |

@@ -44,7 +44,7 @@ public final class ReactNativeRuntime implements Application.ActivityLifecycleCa
                 byte[] buffer = new byte[8192];
                 int count;
                 while ((count = input.read(buffer)) != -1) {
-                    if (data.size() + count > 65536) throw new java.io.IOException("Patch bootstrap exceeds bounds.");
+                    if (data.size() + count > 131072) throw new java.io.IOException("Patch bootstrap exceeds bounds.");
                     data.write(buffer, 0, count);
                 }
                 Path file = Files.createTempFile(application.getCodeCacheDir().toPath(), "twitch-patch-", ".js");

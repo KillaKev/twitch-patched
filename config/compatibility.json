@@ -684,16 +684,31 @@
     "scope": "Picker checks on one Android device. Load times depend on provider connectivity; large-catalog scrolling remains a normal-use acceptance check."
   },
   "uiSettings": {
-    "date": "2026-10-09",
-    "javaKotlinTests": 195,
-    "javaScriptTests": 26,
+    "date": "2026-10-10",
+    "javaKotlinTests": 207,
+    "javaScriptTests": 33,
     "entryPoints": [
       "Patch settings",
       "Native player settings",
       "V2 player settings"
     ],
     "customizationDefaults": "disabled",
-    "registeredOptions": [],
+    "registeredOptions": [
+      "classic_controls_hide_clip",
+      "classic_controls_hide_cast",
+      "classic_controls_hide_share",
+      "classic_support_hide_subscribe",
+      "classic_support_hide_gift",
+      "classic_support_hide_bits",
+      "vertical_controls_hide_clip",
+      "vertical_controls_hide_cast",
+      "vertical_controls_hide_share",
+      "vertical_support_hide_subscribe",
+      "vertical_support_hide_gift",
+      "vertical_support_hide_bits",
+      "fullscreen_hide_status_bar",
+      "fullscreen_hide_navigation_bar"
+    ],
     "evaluations": [
       {
         "versionName": "31.5.2",
@@ -712,14 +727,15 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "4e4a37baf8dad26c3a9c7284df505bcc740048832d105861520216d05643c749",
-        "apkSha256": "ef8d20ed2a37995e9c49db000b45db01d23bf90ad2fb73d6cdc70ce44aa0baf2",
+        "bundleSha256": "a93a36568c4db162ee70e58fbfc078a2223971f9dfa9fb59fd23402873a2da7f",
+        "apkSha256": "1360919bc275a6eb288ad2a23803e2614df6097b755477461756cf03c116535b",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
+        "latestBundleOutputComparison": "UI adapter and runtime extension match the verified output",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "pending"
+        "deviceVerification": "Runtime UI checks pending"
       },
       {
         "versionName": "31.4.2",
@@ -728,25 +744,39 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "4e4a37baf8dad26c3a9c7284df505bcc740048832d105861520216d05643c749",
-        "apkSha256": "4e7675f003866ba33222300eae1f8a8d7761e0a72909f3d796078509396fbfdb",
+        "bundleSha256": "d42f00ef84b2d289ad91e3b20db3e75e2109d47b4aca5b81045aa0c572d4328f",
+        "apkSha256": "c5af6fab47dc757b4592efa26981ab9e794fc4e340f8d540d89ad2fd1f1e9c19",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
+        "latestBundleOutputComparison": "Evaluated with current bundle",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "pending"
+        "deviceVerification": "Runtime UI checks pending"
       }
     ],
+    "androidVerification": {
+      "androidApi": 33,
+      "xmlResourceTransformation": "passed using Android DOM and the installed Manager runtime",
+      "policyClassLinkage": "passed: six policy classes, 42 methods and six XML view constructors",
+      "fullscreenFlagRestoration": "passed in a standalone ART process",
+      "managerApkBuild": "pending; device locked",
+      "installation": "not performed",
+      "runtimeUiChecks": "pending"
+    },
     "regressionChecks": [
-      "Preferences remain independent and persist across registry recreation",
-      "Unregistered options remain inactive",
-      "Subscriptions stop receiving changes after closing",
-      "Deferred navigation retains its group target",
-      "Native URL navigation preserves original branches and argument registers",
-      "V2 settings entry preserves native callbacks, sheet components and unrelated menus",
-      "V2 preference changes update subscribers without duplicating notifications"
+      "All 14 customization options default to off and persist independently",
+      "Group switches derive mixed state and notify once after updating all members",
+      "Classic Split and Vertical View use independent preferences",
+      "Nested Back navigation restores the previous group and scroll position",
+      "Hidden action models retain Follow, notification settings and original callbacks",
+      "Hidden player controls remove empty wrappers and preserve volume and Reload",
+      "UI and Reload adapters compose in either registration order",
+      "Bits visibility preserves original availability when overrides are disabled",
+      "Native composition wrappers retain argument registers and balanced groups",
+      "XML transformations preserve IDs, attributes, constraints and children",
+      "Fullscreen overrides restore host flags and follow activity lifecycle"
     ],
-    "scope": "Foundation only. Device navigation, Back behavior and theme checks are pending."
+    "scope": "Desktop APK evaluations and standalone Android parser and DEX checks. Manager APK build, visual reflow, settings navigation and live toggle behavior require device acceptance testing."
   }
 }

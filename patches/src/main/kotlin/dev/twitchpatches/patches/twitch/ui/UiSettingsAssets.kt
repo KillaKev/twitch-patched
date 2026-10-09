@@ -24,6 +24,8 @@ internal val uiSettingsAssetsPatch = resourcePatch {
             .replace("__TWITCH_UI_SHEET_MODULE__", sheet.module.toString())
             .replace("__TWITCH_UI_ROW_MODULE__", row.module.toString())
             .replace("__TWITCH_UI_NATIVE_MODULE__", native.toString()))
+        appendUiControls(bundle)
+        prepareUiViewResources()
         val layout = get("res/layout").listFiles().orEmpty().filter {
             it.extension == "xml" && it.readText().contains("@id/options_scrollview")
         }.uniqueHook("native player settings layout")

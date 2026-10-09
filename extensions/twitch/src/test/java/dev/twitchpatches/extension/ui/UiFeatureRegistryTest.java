@@ -79,4 +79,38 @@ public class UiFeatureRegistryTest {
         option.setEnabled(false);
         assertEquals(1, changes.get());
     }
+
+    @Test public void masterReflectsMixedStateAndPublishesOneCompleteUpdate() {
+        UiFeatureRegistry registry = registry();
+        ToggleSetting subscribe = registry.register("subscribe", "Subscribe", "");
+        ToggleSetting bits = registry.register("bits", "Bits", "");
+        ToggleSetting master = registry.master("all", java.util.List.of(subscribe, bits));
+        AtomicInteger updates = new AtomicInteger();
+        registry.observe(() -> {
+            assertEquals(subscribe.isEnabled(), bits.isEnabled());
+            updates.incrementAndGet();
+        });
+        master.setEnabled(true);
+        assertTrue(master.isEnabled());
+        assertEquals(1, updates.get());
+        master.setEnabled(true);
+        assertEquals(1, updates.get());
+        master.setEnabled(false);
+        assertFalse(master.isEnabled());
+        assertEquals(2, updates.get());
+        assertFalse(saved.containsKey("all"));
+        assertFalse(registry.snapshot().containsKey("all"));
+    }
+
+    @Test public void catalogueKeepsLayoutsIndependentAndEveryOptionOff() {
+        UiFeatureRegistry registry = registry();
+        var categories = UiOptions.create(registry);
+        assertEquals(3, categories.size());
+        assertEquals(14, registry.options().size());
+        assertTrue(registry.options().stream().noneMatch(ToggleSetting::isEnabled));
+        ToggleSetting classic = registry.options().stream().filter(option -> option.key().equals("classic_support_hide_bits")).findFirst().orElseThrow();
+        classic.setEnabled(true);
+        assertTrue(registry.enabled("classic_support_hide_bits"));
+        assertFalse(registry.enabled("vertical_support_hide_bits"));
+    }
 }

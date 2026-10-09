@@ -18,6 +18,8 @@ public final class UiFeatureRegistry {
     private final Preferences preferences;
     private final Map<String, ToggleSetting> features = new LinkedHashMap<>();
     private final Set<Runnable> listeners = new LinkedHashSet<>();
+    private boolean batching;
+    private boolean changed;
 
     public UiFeatureRegistry(Preferences preferences) { this.preferences = preferences; }
 
@@ -52,6 +54,34 @@ public final class UiFeatureRegistry {
 
     public synchronized List<ToggleSetting> options() { return new ArrayList<>(features.values()); }
 
+    public ToggleSetting master(String key, List<ToggleSetting> children) {
+        List<ToggleSetting> members = new ArrayList<>(children);
+        if (members.isEmpty()) throw new IllegalArgumentException("UI group requires options.");
+        return new ToggleSetting() {
+            @Override public String key() { return key; }
+            @Override public String title() { return "Hide all"; }
+            @Override public String summary() {
+                long hidden = members.stream().filter(ToggleSetting::isEnabled).count();
+                return hidden == 0 ? "All visible." : hidden == members.size() ? "All hidden."
+                        : hidden + " of " + members.size() + " hidden.";
+            }
+            @Override public SettingSection section() { return SettingSection.INTERFACE; }
+            @Override public boolean isEnabled() { return members.stream().allMatch(ToggleSetting::isEnabled); }
+            @Override public void setEnabled(boolean enabled) { setAll(members, enabled); }
+        };
+    }
+
+    private void setAll(List<ToggleSetting> members, boolean enabled) {
+        synchronized (this) {
+            batching = true;
+            try { members.forEach(option -> option.setEnabled(enabled)); }
+            finally { batching = false; }
+            if (!changed) return;
+            changed = false;
+        }
+        notifyChanged();
+    }
+
     public synchronized Map<String, Boolean> snapshot() {
         Map<String, Boolean> values = new LinkedHashMap<>();
         features.forEach((key, option) -> values.put(key, option.isEnabled()));
@@ -67,7 +97,10 @@ public final class UiFeatureRegistry {
 
     private void notifyChanged() {
         List<Runnable> callbacks;
-        synchronized (this) { callbacks = new ArrayList<>(listeners); }
+        synchronized (this) {
+            if (batching) { changed = true; return; }
+            callbacks = new ArrayList<>(listeners);
+        }
         callbacks.forEach(Runnable::run);
     }
 }

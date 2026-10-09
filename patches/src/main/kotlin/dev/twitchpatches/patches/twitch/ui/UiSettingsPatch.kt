@@ -10,7 +10,7 @@ internal const val UI_SETTINGS = "Ldev/twitchpatches/extension/ui/UiSettings;"
 @Suppress("unused")
 val uiSettingsPatch = bytecodePatch(
     name = "UI settings",
-    description = "Adds settings for customizing the Twitch interface.",
+    description = "Customizes player controls, channel action buttons and fullscreen system bars.",
     default = true,
 ) {
     compatibleWith(TwitchTarget.compatibility)
@@ -19,6 +19,8 @@ val uiSettingsPatch = bytecodePatch(
         injectUiPlayerEntry()
         injectUiNavigation()
         injectUiPolicyBridge()
+        injectUiViews()
+        injectUiComposition()
         val app = mutableClassDefBy("Ltv/twitch/android/app/consumer/TwitchApplication;").methods.filter {
             it.name == "onCreate" && it.isInstance(emptyList(), "V")
         }.uniqueHook("UI settings initialization")
