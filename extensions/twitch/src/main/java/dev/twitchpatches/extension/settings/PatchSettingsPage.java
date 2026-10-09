@@ -17,10 +17,19 @@ import android.widget.Toolbar;
 public final class PatchSettingsPage extends DialogFragment {
     static final String TAG = "twitch_patches_settings";
     private String groupKey;
+    private boolean directGroup;
     private int rootScroll;
     private LinearLayout contents;
     private ScrollView scroll;
     private Toolbar toolbar;
+
+    static PatchSettingsPage forGroup(String key) {
+        PatchSettingsPage page = new PatchSettingsPage();
+        Bundle arguments = new Bundle();
+        arguments.putString("group", key);
+        page.setArguments(arguments);
+        return page;
+    }
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -28,6 +37,10 @@ public final class PatchSettingsPage extends DialogFragment {
         if (state != null) {
             groupKey = state.getString("group");
             rootScroll = state.getInt("root_scroll");
+            directGroup = state.getBoolean("direct_group");
+        } else if (getArguments() != null) {
+            groupKey = getArguments().getString("group");
+            directGroup = groupKey != null;
         }
     }
 
@@ -72,10 +85,12 @@ public final class PatchSettingsPage extends DialogFragment {
         toolbar.setTitle(group == null ? "Patch settings" : group.title());
         contents.removeAllViews();
         TwitchSettingsRows.populate(contents, group == null ? PatchSettings.options() : group.children(), this::open, group == null);
+        if (group != null && group.children().isEmpty() && !group.emptyMessage().isEmpty())
+            TwitchSettingsRows.empty(contents, group.emptyMessage());
     }
 
     private void back() {
-        if (groupKey == null) { closePage(); return; }
+        if (groupKey == null || directGroup) { closePage(); return; }
         groupKey = null;
         renderPage();
         scroll.post(() -> { if (scroll != null) scroll.scrollTo(0, rootScroll); });
@@ -85,6 +100,7 @@ public final class PatchSettingsPage extends DialogFragment {
         super.onSaveInstanceState(state);
         state.putString("group", groupKey);
         state.putInt("root_scroll", rootScroll);
+        state.putBoolean("direct_group", directGroup);
     }
 
     @Override public void onDestroyView() {

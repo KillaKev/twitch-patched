@@ -30,7 +30,7 @@ final class TwitchSettingsRows {
         }
     }
 
-    private static View navigation(ViewGroup parent, SettingGroup group, Consumer<SettingGroup> open) {
+    static View navigation(ViewGroup parent, SettingGroup group, Consumer<SettingGroup> open) {
         View row = inflate(parent, "sub_menu_recycler_item");
         TextView title = TwitchSettingsResources.view(row, "menu_item_title", TextView.class);
         TextView description = TwitchSettingsResources.view(row, "menu_item_description", TextView.class);
@@ -44,6 +44,18 @@ final class TwitchSettingsRows {
         row.setOnClickListener(view -> open.accept(group));
         row.setSaveFromParentEnabled(false);
         return row;
+    }
+
+    static void empty(ViewGroup parent, String message) {
+        View row = inflate(parent, "sub_menu_recycler_item");
+        row.setForeground(null);
+        row.setClickable(false);
+        row.setFocusable(false);
+        TextView title = TwitchSettingsResources.view(row, "menu_item_title", TextView.class);
+        title.setVisibility(View.GONE);
+        TextView description = TwitchSettingsResources.view(row, "menu_item_description", TextView.class);
+        description.setText(message);
+        parent.addView(row);
     }
 
     private static View header(ViewGroup parent, SettingSection section) {

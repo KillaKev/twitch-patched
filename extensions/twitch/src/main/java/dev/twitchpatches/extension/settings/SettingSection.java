@@ -4,6 +4,7 @@ public enum SettingSection {
     CHANNEL_POINTS("Channel points"),
     CHAT("Chat"),
     PLAYBACK("Playback"),
+    INTERFACE("Interface"),
     ADS("Ads"),
     PROMOTIONS("Promotions");
 
