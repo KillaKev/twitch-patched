@@ -9,6 +9,7 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction35c
 import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction3rc
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import dev.twitchpatches.patches.twitch.reload.nativeReloadMethod
 import dev.twitchpatches.patches.twitch.shared.*
 
@@ -116,8 +117,18 @@ internal fun uiWrapper(original: Method, name: String, contract: UiCompositionCo
 }
 
 private fun BytecodePatchContext.replaceUiCalls(methods: List<Method>, original: String, replacement: MethodReference) {
+    rewriteUiCalls(methods, original, replacement) { source ->
+        mutableClassDefBy(source.definingClass).methods.single { it.reference == source.reference }
+    }
+}
+
+internal fun rewriteUiCalls(methods: List<Method>, original: String, replacement: MethodReference,
+    mutableMethod: (Method) -> MutableMethod) {
     methods.forEach { source ->
-        val method = mutableClassDefBy(source.definingClass).methods.single { it.reference == source.reference }
+        if (source.implementation?.instructions?.none {
+            (it as? ReferenceInstruction)?.reference?.toString() == original
+        } != false) return@forEach
+        val method = mutableMethod(source)
         method.code().withIndex().filter { (it.value as? ReferenceInstruction)?.reference?.toString() == original }.forEach { (index, call) ->
             method.replaceInstruction(index, when (call) {
                 is FiveRegisterInstruction -> BuilderInstruction35c(call.opcode, call.registerCount, call.registerC,

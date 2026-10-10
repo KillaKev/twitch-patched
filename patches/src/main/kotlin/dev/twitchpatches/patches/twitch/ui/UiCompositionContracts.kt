@@ -42,18 +42,20 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     val end = classic.code().drop(startIndex + 1).mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
         .first { it.definingClass == concrete && it.parameterTypes.isEmpty() && it.returnType == "V" }
     val fragment = classDefBy("Ltv/twitch/android/feature/theatre/vertical/VerticalTheatreFragment;")
-    val controls = all.filter { it.hasStrings("mute_button", "go_to_classic_view", "player_settings_button") &&
-        fragment.methods.any { getter -> getter.parameterTypes.isEmpty() && getter.returnType == it.definingClass } }
+    val controlTypes = fragment.methods.filter { it.parameterTypes.isEmpty() }.map { it.returnType }.toSet()
+    val controls = all.filter { it.definingClass in controlTypes &&
+        it.hasStrings("mute_button", "go_to_classic_view", "player_settings_button") }
         .uniqueHook("UI native controls owner")
     val root = all.filter { it.definingClass == volume.definingClass && it.references().any { ref ->
         ref is TypeReference && ref.type == controls.definingClass
     } &&
         it.hasStrings("No ViewModelStoreOwner was provided via LocalViewModelStoreOwner") }.uniqueHook("UI controls composition root")
     val collect = root.references().filterIsInstance<MethodReference>().filter {
-        it.parameterTypes.size == 2 && it.parameterTypes[1] == composer && all.any { method ->
-            method.definingClass == it.parameterTypes[0] && method.name == "getValue" &&
-                method.parameterTypes.isEmpty() && method.returnType == "Ljava/lang/Object;"
-        }
+        it.parameterTypes.size == 2 && it.parameterTypes[1] == composer && it.parameterTypes[0].startsWith("L") &&
+            classDefBy(it.parameterTypes[0].toString()).methods.any { method ->
+                method.name == "getValue" &&
+                    method.parameterTypes.isEmpty() && method.returnType == "Ljava/lang/Object;"
+            }
     }.distinctBy { it.toString() }.uniqueHook("UI lifecycle state collector")
     val value = root.references().filterIsInstance<MethodReference>().filter {
         it.name == "getValue" && it.parameterTypes.isEmpty() && it.returnType == "Ljava/lang/Object;"
@@ -61,8 +63,8 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     val constructor = all.filter { it.name == "<init>" && it.hasStrings("VerticalTheatrePlayable", "VerticalTheatre", "video_cc") }
         .uniqueHook("UI player preference flow owner")
     val factory = constructor.references().filterIsInstance<MethodReference>().filter {
-        it.parameterTypes == listOf("Ljava/lang/Object;") && all.any { method ->
-            method.definingClass == it.returnType && method.name == "getValue" && method.parameterTypes.isEmpty()
+        it.parameterTypes == listOf("Ljava/lang/Object;") && it.returnType.startsWith("L") && classDefBy(it.returnType).methods.any { method ->
+            method.name == "getValue" && method.parameterTypes.isEmpty()
         }
     }.distinctBy { it.toString() }.uniqueHook("UI mutable preference flow factory")
     val setter = classDefBy(factory.returnType).methods.filter {
@@ -72,7 +74,7 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     val share = renderers.filter { it.parameterTypes == listOf(callback, composer, "I") && it.hasResource("string/share") }
         .uniqueHook("UI native Share renderer")
     val cast = renderers.filter { it.parameterTypes == share.parameterTypes && it.references().filterIsInstance<MethodReference>()
-        .filter { ref -> ref.name == "<init>" }.any { ref -> all.any { method -> method.definingClass == ref.definingClass &&
+        .filter { ref -> ref.name == "<init>" }.any { ref -> classDefBy(ref.definingClass).methods.any { method ->
             method.references().filterIsInstance<MethodReference>().any { call ->
                 call.definingClass == "Landroidx/mediarouter/app/MediaRouteButton;" && call.name == "<init>"
             }
@@ -105,4 +107,6 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
         mapOf("subscribe" to classicSubscribe, "gift" to classicGift))
 }
 
-private fun Method.hasResource(name: String) = code().any { (it as? WideLiteralInstruction)?.wideLiteral == uiResourceIds[name] }
+private fun Method.hasResource(name: String) = implementation?.instructions?.any {
+    (it as? WideLiteralInstruction)?.wideLiteral == uiResourceIds[name]
+} == true

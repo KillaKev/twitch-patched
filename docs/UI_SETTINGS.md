@@ -27,6 +27,8 @@ subscription that must close when the view detaches. Retain Twitch's requested
 visibility so turning a setting off restores the current application state.
 Native Compose controls collect the shared preference flow inside a balanced
 composition group. Resolve Compose types and methods from the original APK.
+Find matching call sites before requesting mutable classes. Unrelated classes
+must remain unchanged so patching fits Android Manager's memory limits.
 
 React Native components use `runtime.ui.useEnabled(React, key)`. Preferences
 synchronize when the runtime attaches and when an option changes. Filter action

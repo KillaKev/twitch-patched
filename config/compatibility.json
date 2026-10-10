@@ -685,7 +685,7 @@
   },
   "uiSettings": {
     "date": "2026-10-10",
-    "javaKotlinTests": 207,
+    "javaKotlinTests": 208,
     "javaScriptTests": 33,
     "entryPoints": [
       "Patch settings",
@@ -712,7 +712,7 @@
     "evaluations": [
       {
         "versionName": "31.5.2",
-        "selection": "Full patch selection",
+        "selection": "Nine recommended patches",
         "patches": [
           "Auto-claim bonus channel points",
           "BTTV, FFZ and 7TV emotes",
@@ -721,21 +721,20 @@
           "Hide Turbo promotions",
           "Hide feed and display ads",
           "Hide subscription discount banners",
-          "Inspect Twitch APK",
-          "Playback diagnostics",
           "Reload stream",
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "a93a36568c4db162ee70e58fbfc078a2223971f9dfa9fb59fd23402873a2da7f",
-        "apkSha256": "1360919bc275a6eb288ad2a23803e2614df6097b755477461756cf03c116535b",
+        "bundleSha256": "3634488e648d97aaef2c904fa54555a423641e8ae910dcc54f437e2d73c6bce0",
+        "apkSha256": "240b880e57d9da39e6210281cf054bca1bd8c9dda0581d238bc6d680d24c41eb",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "UI adapter and runtime extension match the verified output",
+        "latestBundleOutputComparison": "Rebuilt bundle differs only in ZIP metadata and MANIFEST.MF; patch code and extension payload match",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Runtime UI checks pending"
+        "deviceVerification": "Runtime UI checks pending",
+        "heapMb": 1024
       },
       {
         "versionName": "31.4.2",
@@ -744,15 +743,16 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "d42f00ef84b2d289ad91e3b20db3e75e2109d47b4aca5b81045aa0c572d4328f",
-        "apkSha256": "c5af6fab47dc757b4592efa26981ab9e794fc4e340f8d540d89ad2fd1f1e9c19",
+        "bundleSha256": "5168657fc99b38fe1b3f2fc050f66e754b901d636be35976e322b3e6dda2e6f5",
+        "apkSha256": "a63f5816678f5c295c2a672c5d5c98e32578408f157e7319d3bc5a206d7cb50a",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Runtime UI checks pending"
+        "deviceVerification": "Runtime UI checks pending",
+        "heapMb": 1024
       }
     ],
     "androidVerification": {
@@ -760,9 +760,10 @@
       "xmlResourceTransformation": "passed using Android DOM and the installed Manager runtime",
       "policyClassLinkage": "passed: six policy classes, 42 methods and six XML view constructors",
       "fullscreenFlagRestoration": "passed in a standalone ART process",
-      "managerApkBuild": "pending; device locked",
+      "managerApkBuild": "Previous bundle failed with a 1024 MB heap in Manager 1.35.0 / patcher 1.15.1; corrected bundle awaits device build",
       "installation": "not performed",
-      "runtimeUiChecks": "pending"
+      "runtimeUiChecks": "pending",
+      "managerRerun": "pending; no ADB device connected"
     },
     "regressionChecks": [
       "All 14 customization options default to off and persist independently",
@@ -775,8 +776,22 @@
       "Bits visibility preserves original availability when overrides are disabled",
       "Native composition wrappers retain argument registers and balanced groups",
       "XML transformations preserve IDs, attributes, constraints and children",
-      "Fullscreen overrides restore host flags and follow activity lifecycle"
+      "Fullscreen overrides restore host flags and follow activity lifecycle",
+      "Native call-site search leaves unrelated classes immutable"
     ],
-    "scope": "Desktop APK evaluations and standalone Android parser and DEX checks. Manager APK build, visual reflow, settings navigation and live toggle behavior require device acceptance testing."
+    "scope": "Desktop evaluations within a 1024 MB heap and previous standalone Android parser and DEX checks. Corrected Manager build and runtime UI acceptance remain pending.",
+    "patchingMemory": {
+      "date": "2026-10-10",
+      "heapMb": 1024,
+      "appVersion": "31.5.2",
+      "patchSelection": "Nine recommended patches including UI settings",
+      "patchingRebuildingSigning": "passed",
+      "nativeCompositionMutableClasses": 7,
+      "totalClasses": 58971,
+      "nativeCompositionProbeMilliseconds": 15067,
+      "sdkPerDexAndApkChecks": "passed",
+      "introducedHierarchyFindings": 0,
+      "regression": "Only methods with matching calls become mutable; invocation formats, registers and original methods are preserved"
+    }
   }
 }
