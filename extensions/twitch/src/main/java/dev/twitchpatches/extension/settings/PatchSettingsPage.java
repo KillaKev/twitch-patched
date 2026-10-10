@@ -12,6 +12,8 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toolbar;
+import android.widget.SearchView;
+import android.view.inputmethod.InputMethodManager;
 
 @SuppressWarnings("deprecation") // Platform fragment avoids depending on Twitch's obfuscated AndroidX router.
 public final class PatchSettingsPage extends DialogFragment {
@@ -20,6 +22,8 @@ public final class PatchSettingsPage extends DialogFragment {
     private LinearLayout contents;
     private ScrollView scroll;
     private Toolbar toolbar;
+    private SearchView search;
+    private boolean restoringSearch;
 
     static PatchSettingsPage forGroup(String key) {
         PatchSettingsPage page = new PatchSettingsPage();
@@ -33,7 +37,8 @@ public final class PatchSettingsPage extends DialogFragment {
         super.onCreate(state);
         setStyle(STYLE_NO_TITLE, 0);
         if (state != null && state.containsKey("routes") && state.containsKey("offsets")) {
-            navigation = new SettingsNavigation(state.getStringArrayList("routes"), state.getIntegerArrayList("offsets"));
+            navigation = new SettingsNavigation(state.getStringArrayList("routes"), state.getIntegerArrayList("offsets"),
+                    state.getStringArrayList("queries"), state.getIntegerArrayList("browse_offsets"));
         } else navigation = new SettingsNavigation(getArguments() == null ? null : getArguments().getString("group"));
     }
 
@@ -52,6 +57,22 @@ public final class PatchSettingsPage extends DialogFragment {
         page.addView(toolbar,
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        search = SettingsSearchBar.create(context);
+        page.addView(search, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        syncSearch();
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override public boolean onQueryTextSubmit(String query) { hideKeyboard(); return true; }
+            @Override public boolean onQueryTextChange(String query) {
+                if (restoringSearch || contents == null || query.equals(navigation.query())) return true;
+                navigation.search(query, scroll.getScrollY());
+                renderPage();
+                restoreScroll();
+                return true;
+            }
+        });
+        page.setFocusableInTouchMode(true);
+        page.requestFocus();
+
         scroll = new ScrollView(context);
         scroll.setFillViewport(true);
         contents = new LinearLayout(context);
@@ -68,6 +89,8 @@ public final class PatchSettingsPage extends DialogFragment {
 
     private void open(SettingGroup group) {
         navigation.open(group.key(), scroll.getScrollY());
+        hideKeyboard();
+        syncSearch();
         renderPage();
         scroll.scrollTo(0, 0);
     }
@@ -76,13 +99,26 @@ public final class PatchSettingsPage extends DialogFragment {
         SettingGroup group = PatchSettings.group(navigation.current());
         toolbar.setTitle(group == null ? "Patch settings" : group.title());
         contents.removeAllViews();
-        TwitchSettingsRows.populate(contents, group == null ? PatchSettings.options() : group.children(), this::open, group == null);
+        if (!navigation.query().trim().isEmpty()) {
+            TwitchSettingsRows.results(contents, SettingsSearch.find(PatchSettings.options(), navigation.query(), ""), this::open);
+            return;
+        }
+        java.util.List<? extends SettingEntry> options = group == null ? PatchSettings.options() : group.children();
+        if (group != null && !group.summary().isEmpty()) TwitchSettingsRows.empty(contents, group.summary());
+        boolean headers = group == null || options.stream().map(SettingEntry::section).distinct().count() > 1;
+        TwitchSettingsRows.populate(contents, options, this::open, headers);
         if (group != null && group.children().isEmpty() && !group.emptyMessage().isEmpty())
             TwitchSettingsRows.empty(contents, group.emptyMessage());
     }
 
     private void back() {
+        if (!navigation.query().isEmpty()) {
+            search.setQuery("", false);
+            hideKeyboard();
+            return;
+        }
         if (!navigation.back()) { closePage(); return; }
+        syncSearch();
         renderPage();
         restoreScroll();
     }
@@ -90,9 +126,11 @@ public final class PatchSettingsPage extends DialogFragment {
     private void restoreScroll() {
         int offset = navigation.scroll();
         String route = navigation.current();
+        String query = navigation.query();
         ScrollView target = scroll;
         target.post(() -> {
-            if (scroll == target && java.util.Objects.equals(route, navigation.current())) target.scrollTo(0, offset);
+            if (scroll == target && java.util.Objects.equals(route, navigation.current()) &&
+                    query.equals(navigation.query())) target.scrollTo(0, offset);
         });
     }
 
@@ -101,6 +139,8 @@ public final class PatchSettingsPage extends DialogFragment {
         if (scroll != null) navigation.saveScroll(scroll.getScrollY());
         state.putStringArrayList("routes", navigation.routes());
         state.putIntegerArrayList("offsets", navigation.offsets());
+        state.putStringArrayList("queries", navigation.queries());
+        state.putIntegerArrayList("browse_offsets", navigation.browseOffsets());
     }
 
     @Override public void onDestroyView() {
@@ -108,6 +148,8 @@ public final class PatchSettingsPage extends DialogFragment {
         contents = null;
         scroll = null;
         toolbar = null;
+        if (search != null) search.setOnQueryTextListener(null);
+        search = null;
     }
 
     @Override public void onStart() {
@@ -119,6 +161,20 @@ public final class PatchSettingsPage extends DialogFragment {
         window.setBackgroundDrawable(new ColorDrawable(TwitchSettingsResources.color(getActivity(), "background_body")));
         window.setDimAmount(0);
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
+                android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void syncSearch() {
+        restoringSearch = true;
+        try { search.setQuery(navigation.query(), false); }
+        finally { restoringSearch = false; }
+    }
+
+    private void hideKeyboard() {
+        search.clearFocus();
+        InputMethodManager keyboard = (InputMethodManager) search.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (keyboard != null) keyboard.hideSoftInputFromWindow(search.getWindowToken(), 0);
     }
 
     private void closePage() {

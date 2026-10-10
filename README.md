@@ -6,6 +6,8 @@ Independent patches for the official Twitch Android app, compatible with [Morphe
 
 Select each feature independently when patching. Included features appear under Twitch's **Settings > Patch settings**; omitted patches do not add settings.
 
+Patch settings include search across categories and individual options. UI controls are grouped by function and player layout, with group and individual switches.
+
 | Patch | Behavior |
 | --- | --- |
 | Block stream ads | Replaces detected preroll and midroll ads with direct Twitch playback. |

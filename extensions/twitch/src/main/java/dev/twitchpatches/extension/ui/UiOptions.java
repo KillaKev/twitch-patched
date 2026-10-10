@@ -10,44 +10,49 @@ import java.util.List;
 
 final class UiOptions {
     static List<SettingEntry> create(UiFeatureRegistry registry) {
-        return Arrays.asList(layout(registry, "classic", "Classic Split"), layout(registry, "vertical", "Vertical View"),
-                fullscreen(registry));
-    }
-
-    private static SettingGroup fullscreen(UiFeatureRegistry registry) {
-        List<ToggleSetting> toggles = Arrays.asList(
-                registry.register("fullscreen_hide_status_bar", "Hide status bar", "Use the camera cutout area during fullscreen playback."),
-                registry.register("fullscreen_hide_navigation_bar", "Hide navigation bar", "Hide Android navigation during fullscreen playback."));
         List<SettingEntry> entries = new ArrayList<>();
-        entries.add(registry.master("fullscreen_all", toggles));
-        entries.addAll(toggles);
-        return group("ui_fullscreen", "Fullscreen", "System bars and camera cutout.", entries);
+        entries.add(buttons(registry, "classic_controls", "Classic Split controls", SettingSection.PLAYER_CONTROLS,
+                "Clip, Cast and Share in Classic Split.", controls()));
+        entries.add(buttons(registry, "vertical_controls", "Vertical View controls", SettingSection.PLAYER_CONTROLS,
+                "Clip, Cast and Share in Vertical View.", controls()));
+        entries.add(buttons(registry, "classic_support", "Classic Split actions", SettingSection.CHANNEL_ACTIONS,
+                "Subscribe, Gift a Sub and Bits in Classic Split.", actions()));
+        entries.add(buttons(registry, "vertical_support", "Vertical View actions", SettingSection.CHANNEL_ACTIONS,
+                "Subscribe, Gift a Sub and Bits in Vertical View.", actions()));
+        List<ToggleSetting> bars = Arrays.asList(
+                registry.register("fullscreen_hide_status_bar", "Hide status bar",
+                        "Hide Android's status bar and use the camera cutout area in landscape fullscreen.",
+                        SettingSection.FULLSCREEN, "ic_fullscreen_enter"),
+                registry.register("fullscreen_hide_navigation_bar", "Hide navigation bar",
+                        "Hide Android's navigation bar in landscape fullscreen.",
+                        SettingSection.FULLSCREEN, "ic_fullscreen_enter"));
+        entries.add(registry.master("fullscreen_all", bars, "Hide both system bars", SettingSection.FULLSCREEN));
+        entries.addAll(bars);
+        return entries;
     }
 
-    private static SettingGroup layout(UiFeatureRegistry registry, String prefix, String title) {
-        return group("ui_" + prefix, title, "Player controls and channel actions.", Arrays.asList(
-                buttons(registry, prefix + "_controls", "Player controls", new String[][] {
-                        {"clip", "Clip"}, {"cast", "Cast"}, {"share", "Share"}}),
-                buttons(registry, prefix + "_support", "Channel actions", new String[][] {
-                        {"subscribe", "Subscribe"}, {"gift", "Gift a Sub"}, {"bits", "Bits"}})));
+    private static String[][] controls() {
+        return new String[][] {{"clip", "Clip", "ic_clip"}, {"cast", "Cast", "chromecast"}, {"share", "Share", "ic_share"}};
     }
 
-    private static SettingGroup buttons(UiFeatureRegistry registry, String prefix, String title, String[][] definitions) {
+    private static String[][] actions() {
+        return new String[][] {{"subscribe", "Subscribe", "ic_subscribe"}, {"gift", "Gift a Sub", "ic_gift"}, {"bits", "Bits", "ic_bits"}};
+    }
+
+    private static SettingGroup buttons(UiFeatureRegistry registry, String prefix, String title, SettingSection section,
+            String summary, String[][] definitions) {
         List<ToggleSetting> toggles = new ArrayList<>();
         for (String[] definition : definitions)
-            toggles.add(registry.register(prefix + "_hide_" + definition[0], "Hide " + definition[1], ""));
+            toggles.add(registry.register(prefix + "_hide_" + definition[0], "Hide " + definition[1] + " button", "", section, definition[2]));
         List<SettingEntry> entries = new ArrayList<>();
-        entries.add(registry.master(prefix + "_all", toggles));
+        String all = section == SettingSection.PLAYER_CONTROLS ? "Hide all player buttons" : "Hide all channel buttons";
+        entries.add(registry.master(prefix + "_all", toggles, all, section));
         entries.addAll(toggles);
-        return group("ui_" + prefix, title, "", entries);
-    }
-
-    private static SettingGroup group(String key, String title, String summary, List<? extends SettingEntry> entries) {
         return new SettingGroup() {
-            @Override public String key() { return key; }
+            @Override public String key() { return "ui_" + prefix; }
             @Override public String title() { return title; }
             @Override public String summary() { return summary; }
-            @Override public SettingSection section() { return SettingSection.INTERFACE; }
+            @Override public SettingSection section() { return section; }
             @Override public List<? extends SettingEntry> children() { return entries; }
         };
     }

@@ -35,4 +35,33 @@ public class SettingsNavigationTest {
         assertEquals(90, restored.scroll());
         assertFalse(restored.back());
     }
+
+    @Test public void openingAResultAndGoingBackRestoresSearchAndScroll() {
+        SettingsNavigation state = new SettingsNavigation("ui_settings");
+        state.search("classic bits");
+        state.open("ui_classic_support", 160);
+        assertEquals("", state.query());
+        state.search("subscribe");
+        SettingsNavigation restored = new SettingsNavigation(state.routes(), state.offsets(), state.queries(), state.browseOffsets());
+        assertEquals("subscribe", restored.query());
+        assertTrue(restored.back());
+        assertEquals("classic bits", restored.query());
+        assertEquals(160, restored.scroll());
+        restored.search("");
+        assertEquals(0, restored.scroll());
+    }
+
+    @Test public void clearingSearchRestoresBrowsePositionAfterSavedState() {
+        SettingsNavigation state = new SettingsNavigation("ui_settings");
+        state.search("hide", 320);
+        state.search("hide bits", 80);
+        state.saveScroll(24);
+        SettingsNavigation restored = new SettingsNavigation(state.routes(), state.offsets(), state.queries(), state.browseOffsets());
+        assertEquals(24, restored.scroll());
+        restored.search("", 24);
+        assertEquals(320, restored.scroll());
+        restored.search("clip", 400);
+        restored.search("", 0);
+        assertEquals(400, restored.scroll());
+    }
 }

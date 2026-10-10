@@ -24,15 +24,21 @@ public final class UiFeatureRegistry {
     public UiFeatureRegistry(Preferences preferences) { this.preferences = preferences; }
 
     public synchronized ToggleSetting register(String key, String title, String summary) {
-        if (key == null || !key.matches("[a-z][a-z0-9_]{0,63}") || title == null || title.trim().isEmpty() || summary == null)
-            throw new IllegalArgumentException("UI option requires a stable key, title and summary.");
+        return register(key, title, summary, SettingSection.INTERFACE, "ic_settings");
+    }
+
+    public synchronized ToggleSetting register(String key, String title, String summary, SettingSection section, String icon) {
+        if (key == null || !key.matches("[a-z][a-z0-9_]{0,63}") || title == null || title.trim().isEmpty() || summary == null
+                || section == null || icon == null || !icon.matches("[a-z][a-z0-9_]*"))
+            throw new IllegalArgumentException("UI option requires a stable key, title, summary, section and icon.");
         if (features.containsKey(key)) throw new IllegalStateException("Duplicate UI option: " + key);
         ToggleSetting option = new ToggleSetting() {
             private volatile boolean enabled = preferences.read(key);
             @Override public String key() { return key; }
             @Override public String title() { return title; }
             @Override public String summary() { return summary; }
-            @Override public SettingSection section() { return SettingSection.INTERFACE; }
+            @Override public SettingSection section() { return section; }
+            @Override public String icon() { return icon; }
             @Override public boolean isEnabled() { return enabled; }
             @Override public void setEnabled(boolean value) {
                 synchronized (UiFeatureRegistry.this) {
@@ -55,17 +61,21 @@ public final class UiFeatureRegistry {
     public synchronized List<ToggleSetting> options() { return new ArrayList<>(features.values()); }
 
     public ToggleSetting master(String key, List<ToggleSetting> children) {
+        return master(key, children, "Hide all", SettingSection.INTERFACE);
+    }
+
+    public ToggleSetting master(String key, List<ToggleSetting> children, String title, SettingSection section) {
         List<ToggleSetting> members = new ArrayList<>(children);
         if (members.isEmpty()) throw new IllegalArgumentException("UI group requires options.");
         return new ToggleSetting() {
             @Override public String key() { return key; }
-            @Override public String title() { return "Hide all"; }
+            @Override public String title() { return title; }
             @Override public String summary() {
                 long hidden = members.stream().filter(ToggleSetting::isEnabled).count();
                 return hidden == 0 ? "All visible." : hidden == members.size() ? "All hidden."
                         : hidden + " of " + members.size() + " hidden.";
             }
-            @Override public SettingSection section() { return SettingSection.INTERFACE; }
+            @Override public SettingSection section() { return section; }
             @Override public boolean isEnabled() { return members.stream().allMatch(ToggleSetting::isEnabled); }
             @Override public void setEnabled(boolean enabled) { setAll(members, enabled); }
         };

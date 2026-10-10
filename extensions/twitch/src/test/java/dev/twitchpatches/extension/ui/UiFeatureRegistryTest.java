@@ -1,6 +1,7 @@
 package dev.twitchpatches.extension.ui;
 
 import dev.twitchpatches.extension.settings.ToggleSetting;
+import dev.twitchpatches.extension.settings.SettingSection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,6 +64,10 @@ public class UiFeatureRegistryTest {
         assertThrows(IllegalStateException.class, () -> registry.register("hide_clip", "Other", ""));
         for (String key : new String[] {"", "Hide Clip", "1hide", "bad-key"})
             assertThrows(IllegalArgumentException.class, () -> registry.register(key, "Title", ""));
+        assertThrows(IllegalArgumentException.class,
+                () -> registry.register("missing_section", "Title", "", null, "ic_settings"));
+        assertThrows(IllegalArgumentException.class,
+                () -> registry.register("bad_icon", "Title", "", SettingSection.INTERFACE, "bad-icon"));
     }
 
     @Test public void subscriptionsWithTheSameListenerHaveIndependentLifetimes() throws Exception {
@@ -105,12 +110,34 @@ public class UiFeatureRegistryTest {
     @Test public void catalogueKeepsLayoutsIndependentAndEveryOptionOff() {
         UiFeatureRegistry registry = registry();
         var categories = UiOptions.create(registry);
-        assertEquals(3, categories.size());
+        assertEquals(7, categories.size());
+        assertEquals(java.util.List.of(SettingSection.PLAYER_CONTROLS, SettingSection.CHANNEL_ACTIONS, SettingSection.FULLSCREEN),
+                categories.stream().map(option -> option.section()).distinct().collect(java.util.stream.Collectors.toList()));
+        assertTrue(categories.stream().allMatch(option -> !option.title().isEmpty() && !option.icon().isEmpty()));
         assertEquals(14, registry.options().size());
         assertTrue(registry.options().stream().noneMatch(ToggleSetting::isEnabled));
         ToggleSetting classic = registry.options().stream().filter(option -> option.key().equals("classic_support_hide_bits")).findFirst().orElseThrow();
         classic.setEnabled(true);
         assertTrue(registry.enabled("classic_support_hide_bits"));
         assertFalse(registry.enabled("vertical_support_hide_bits"));
+    }
+
+    @Test public void reorganizedCatalogueRetainsSavedPreferencesAndContextualMasters() {
+        saved.put("classic_support_hide_bits", true);
+        saved.put("fullscreen_hide_status_bar", true);
+        UiFeatureRegistry registry = registry();
+        var categories = UiOptions.create(registry);
+        assertTrue(registry.enabled("classic_support_hide_bits"));
+        assertFalse(registry.enabled("vertical_support_hide_bits"));
+        assertTrue(registry.enabled("fullscreen_hide_status_bar"));
+        ToggleSetting bars = (ToggleSetting) categories.get(4);
+        assertEquals("Hide both system bars", bars.title());
+        assertEquals("1 of 2 hidden.", bars.summary());
+        assertFalse(bars.isEnabled());
+        bars.setEnabled(true);
+        assertTrue(registry.enabled("fullscreen_hide_navigation_bar"));
+        bars.setEnabled(false);
+        assertFalse(registry.enabled("fullscreen_hide_status_bar"));
+        assertTrue(registry.enabled("classic_support_hide_bits"));
     }
 }

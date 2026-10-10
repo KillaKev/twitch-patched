@@ -685,7 +685,7 @@
   },
   "uiSettings": {
     "date": "2026-10-10",
-    "javaKotlinTests": 208,
+    "javaKotlinTests": 218,
     "javaScriptTests": 33,
     "entryPoints": [
       "Patch settings",
@@ -725,11 +725,11 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "3634488e648d97aaef2c904fa54555a423641e8ae910dcc54f437e2d73c6bce0",
-        "apkSha256": "240b880e57d9da39e6210281cf054bca1bd8c9dda0581d238bc6d680d24c41eb",
+        "bundleSha256": "aef37bee98d9971396837b84e508459f32f56b8af595e7ce1cf5eea41808841d",
+        "apkSha256": "3e815b36e48272b423024bc37a0e9a2272fa8f603fdd10482b3344175babba3d",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "Rebuilt bundle differs only in ZIP metadata and MANIFEST.MF; patch code and extension payload match",
+        "latestBundleOutputComparison": "Evaluated with current bundle",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
@@ -743,8 +743,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "5168657fc99b38fe1b3f2fc050f66e754b901d636be35976e322b3e6dda2e6f5",
-        "apkSha256": "a63f5816678f5c295c2a672c5d5c98e32578408f157e7319d3bc5a206d7cb50a",
+        "bundleSha256": "aef37bee98d9971396837b84e508459f32f56b8af595e7ce1cf5eea41808841d",
+        "apkSha256": "ee29aec871be4373e9144290703f631a688b331cfb6a8b76d940a6d36ac1d783",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -777,9 +777,14 @@
       "Native composition wrappers retain argument registers and balanced groups",
       "XML transformations preserve IDs, attributes, constraints and children",
       "Fullscreen overrides restore host flags and follow activity lifecycle",
-      "Native call-site search leaves unrelated classes immutable"
+      "Native call-site search leaves unrelated classes immutable",
+      "Search matches titles, descriptions and layout paths across included patches",
+      "Search handles a 100-option catalog and ranks exact labels first",
+      "Search permits existing group/master key overlap and rejects duplicate entries and cycles",
+      "Back and saved state retain search queries and result positions; clearing search restores browsing position",
+      "Reorganized categories retain saved preferences and contextual group switches"
     ],
-    "scope": "Desktop evaluations within a 1024 MB heap and previous standalone Android parser and DEX checks. Corrected Manager build and runtime UI acceptance remain pending.",
+    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated Manager build and runtime settings UX acceptance remain pending.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -792,6 +797,19 @@
       "sdkPerDexAndApkChecks": "passed",
       "introducedHierarchyFindings": 0,
       "regression": "Only methods with matching calls become mutable; invocation formats, registers and original methods are preserved"
+    },
+    "settingsUx": {
+      "date": "2026-10-10",
+      "categories": [
+        "Player controls",
+        "Channel actions",
+        "Fullscreen"
+      ],
+      "search": "Available on every page; results include category and layout paths and directly editable switches",
+      "nativeResources": "Search theme and all row icons found in both supported original APKs",
+      "preferenceMigration": "Not required; all existing option keys are retained",
+      "desktopEvaluations": "Full APK rebuild and original-aware SDK checks passed at a 1024 MB patcher heap",
+      "deviceAcceptance": "Pending: layout, light/dark themes, keyboard, touch and Back behavior; no device connected"
     }
   }
 }

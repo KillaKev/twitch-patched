@@ -3,22 +3,31 @@
 UI settings are available through Patch settings and live player settings. All
 customization options are off by default and take effect without restarting Twitch.
 
-Classic Split and Vertical View have separate categories:
+Options are grouped by function, with separate Classic Split and Vertical View
+settings for each layout:
 
 - Player controls: Clip, Cast and Share.
 - Channel actions: Subscribe, Gift a Sub and Bits.
+- Fullscreen: status bar, navigation bar and camera cutout behavior.
 
-Each group includes a Hide all switch and individual switches. Hide all reflects
-the current state of its members. Hidden controls are removed from their native
+Player and channel groups include a switch for all buttons and individual
+switches. Group switches show whether all, some or none of their controls are
+hidden. Hidden controls are removed from their native
 constraint chain or action row, so remaining controls retain their order and
 alignment. Fullscreen settings control Android system bars and use of the camera
 cutout area during landscape playback.
+
+Search is available on every Patch settings page and covers the included patches.
+Results show their category and layout, and switches can be changed directly.
+Back restores the previous page, search and scroll position. Clearing a search
+returns to the previous browsing position.
 
 ## Adding an option
 
 Keep each option's hooks and runtime policy under the `ui` feature directory. Add
 the option to `UiOptions` through `UiFeatureRegistry.register`, then include it in
-the appropriate settings group. Preference keys use lowercase letters, digits and
+the appropriate settings group with a section and native drawable icon. Search
+indexes titles, descriptions and the category path. Preference keys use lowercase letters, digits and
 underscores and remain stable across updates. Group switches derive their state
 from individual preferences; they do not store a second set of values.
 
