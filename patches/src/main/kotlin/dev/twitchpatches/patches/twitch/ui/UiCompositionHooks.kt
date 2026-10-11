@@ -76,7 +76,7 @@ internal fun BytecodePatchContext.injectUiComposition() {
         :render
     """)
     owner.methods.add(wrapper)
-    replaceUiCalls(all.filter { it.definingClass != BRIDGE }, support.reference, wrapper)
+    replaceUiCalls(contract.actionCallers.getValue(support.reference), support.reference, wrapper)
     val bits = uiWrapper(contract.bits, "vertical_bits", contract, """
         const-string v1, "vertical_support_hide_bits"
         invoke-static {v1, v0}, $BRIDGE->hidden(Ljava/lang/String;${contract.composer})Z
@@ -93,7 +93,7 @@ internal fun BytecodePatchContext.injectUiComposition() {
             if-nez v1, :done
         """)
         owner.methods.add(action)
-        replaceUiCalls(all.filter { it.definingClass != BRIDGE }, original.reference, action)
+        replaceUiCalls(contract.actionCallers.getValue(original.reference), original.reference, action)
     }
 }
 

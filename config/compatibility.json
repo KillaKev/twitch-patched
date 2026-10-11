@@ -685,7 +685,7 @@
   },
   "uiSettings": {
     "date": "2026-10-11",
-    "javaKotlinTests": 227,
+    "javaKotlinTests": 229,
     "javaScriptTests": 36,
     "entryPoints": [
       "Patch settings",
@@ -729,11 +729,11 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "904397b5a70f9f711959629486538cd65b5f3c3033ce7f5a2023920b41de5942",
-        "apkSha256": "e4e13219b5eea94b6563dc5b0c270a28f9a6aefac2bf0a4f3d3772c6f725691b",
+        "bundleSha256": "1183c4dd69cc909c6bcd307a2bcf2ce6aa8df6e577891e5438a0a862018b73ea",
+        "apkSha256": "bb98030622148af5c8ec306987e8a453a53e6fce96f58ccfadf0c5f6c9cc597a",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "Evaluated with current bundle",
+        "latestBundleOutputComparison": "All unsigned APK entries byte-identical to the previous evaluated build, including eight DEX files and resources",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
@@ -748,11 +748,11 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "904397b5a70f9f711959629486538cd65b5f3c3033ce7f5a2023920b41de5942",
-        "apkSha256": "19bef77f46d85145afc974ff91ad53e111b786aa8dcf938017eb4f5193f39bcb",
+        "bundleSha256": "1183c4dd69cc909c6bcd307a2bcf2ce6aa8df6e577891e5438a0a862018b73ea",
+        "apkSha256": "a8ac282d37c707683513a839eb4a34f422a796fc2611b8831baebb80d6c0f315",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "Evaluated with current bundle",
+        "latestBundleOutputComparison": "All unsigned APK entries byte-identical to the previous evaluated build, including eight DEX files and resources",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
@@ -800,7 +800,8 @@
       "Search combines control names with location labels and fullscreen descriptions",
       "Fullscreen status override excludes cutout padding while retaining keyboard and visible navigation insets",
       "Leaving fullscreen or disabling system-bar overrides restores the original inset type mask",
-      "Viewer inset injection preserves parameter registers, original query and instruction labels in both supported versions"
+      "Viewer inset injection preserves parameter registers, original query and instruction labels in both supported versions",
+      "Native action caller search traverses each method once, matches exact signatures and deduplicates compact and range invocations"
     ],
     "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Settings navigation, header controls, V2 menu entries, fullscreen cutout geometry and Manager build remain pending device acceptance.",
     "patchingMemory": {
@@ -863,6 +864,23 @@
       "lifecycle": "Window insets requested again when overrides change, including leaving fullscreen and activity pause",
       "desktopChecks": "Full DEX rebuild and original-aware SDK checks passed at a 1024 MB patcher heap; compiled bridge present in both output APKs",
       "deviceChecks": "Pending cutout geometry, orientation, keyboard and toggle verification"
+    },
+    "hookSearch": {
+      "date": "2026-10-11",
+      "strategy": "Collect the three native action renderer caller lists in one instruction scan; retain only matching methods",
+      "appVersion": "31.5.2",
+      "methodsScanned": 277698,
+      "benchmarkHeapMb": 1024,
+      "benchmarkPasses": 3,
+      "previousMedianMilliseconds": 9217.2,
+      "optimizedMedianMilliseconds": 389.3,
+      "previousMedianAllocatedMiB": 10419.8,
+      "optimizedMedianAllocatedMiB": 337.8,
+      "allocationMetric": "Cumulative allocations on the benchmark thread, not peak heap use",
+      "scope": "Desktop benchmark of the action caller search; excludes other hooks, DEX rebuilding, resources and signing",
+      "matchedCallers": "Identical in all three benchmark passes",
+      "outputEquivalence": "All unsigned APK entries byte-identical for 31.5.2 with nine recommended patches and 31.4.2 with UI settings only",
+      "androidTiming": "Pending; no ADB device connected"
     }
   }
 }

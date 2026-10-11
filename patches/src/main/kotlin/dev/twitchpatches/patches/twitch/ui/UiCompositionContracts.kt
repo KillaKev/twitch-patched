@@ -17,6 +17,7 @@ internal data class UiCompositionContract(
     val classic: Method, val vertical: Method, val controls: Map<String, Method>, val support: Method,
     val subscribe: FieldReference, val gift: FieldReference, val bits: Method, val supportCallers: List<Method>,
     val classicActions: Map<String, Method>,
+    val actionCallers: Map<String, List<Method>> = emptyMap(),
 )
 
 internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCompositionContract {
@@ -84,15 +85,18 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     val support = all.filter { it.parameterTypes.size == 7 && it.parameterTypes[5] == composer &&
         it.hasResource("string/follow") && it.hasResource("string/subscribe") && it.hasResource("string/gift_a_sub") }
         .uniqueHook("UI native channel action renderer")
-    val supportCallers = all.filter { it.references().any { ref -> ref.toString() == support.reference } }
-    val bits = all.filter { it.parameterTypes.size == 7 && it.parameterTypes[4] == composer && it.hasResource("string/bits") &&
-        supportCallers.any { caller -> caller.references().any { ref -> ref.toString() == it.reference } } }
-        .uniqueHook("UI native Bits renderer")
     val classicGift = all.filter { it.parameterTypes == listOf("I", composer, callback, support.parameterTypes[0], "Z") &&
         it.hasResource("string/gift_a_sub") }.uniqueHook("UI classic Gift a Sub renderer")
     val classicSubscribe = all.filter { it.definingClass == classicGift.definingClass &&
         it.parameterTypes == classicGift.parameterTypes + "Z" && it.hasResource("string/subscribe") }
         .uniqueHook("UI classic Subscribe renderer")
+    val actionCallers = collectUiActionCallers(all.asSequence().filter {
+        it.definingClass != "Ldev/twitchpatches/extension/ui/UiComposeBridge;"
+    }.asIterable(), listOf(support, classicGift, classicSubscribe))
+    val supportCallers = actionCallers.getValue(support.reference)
+    val bits = all.filter { it.parameterTypes.size == 7 && it.parameterTypes[4] == composer && it.hasResource("string/bits") &&
+        supportCallers.any { caller -> caller.references().any { ref -> ref.toString() == it.reference } } }
+        .uniqueHook("UI native Bits renderer")
     fun model(label: String): FieldReference {
         val index = support.code().indexOfFirst { (it as? WideLiteralInstruction)?.wideLiteral == uiResourceIds[label] }
         return support.code().take(index).last { it.opcode == Opcode.SGET_OBJECT }.let {
@@ -104,7 +108,7 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     return UiCompositionContract(composer, concrete, start, end, collect, value, factory, setter,
         classic, vertical, mapOf("clip" to clip, "cast" to cast, "share" to share), support,
         model("string/subscribe"), model("string/gift_a_sub"), bits, supportCallers,
-        mapOf("subscribe" to classicSubscribe, "gift" to classicGift))
+        mapOf("subscribe" to classicSubscribe, "gift" to classicGift), actionCallers)
 }
 
 private fun Method.hasResource(name: String) = implementation?.instructions?.any {
