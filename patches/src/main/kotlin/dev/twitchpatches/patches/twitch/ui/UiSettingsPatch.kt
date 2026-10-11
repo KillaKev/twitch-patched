@@ -25,6 +25,7 @@ val uiSettingsPatch = bytecodePatch(
         injectUiPolicyBridge()
         injectUiViews()
         injectUiComposition()
+        injectUiFullscreenInsets()
         val app = mutableClassDefBy("Ltv/twitch/android/app/consumer/TwitchApplication;").methods.filter {
             it.name == "onCreate" && it.isInstance(emptyList(), "V")
         }.uniqueHook("UI settings initialization")

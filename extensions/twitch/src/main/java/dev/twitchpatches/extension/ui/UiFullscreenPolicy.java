@@ -3,6 +3,8 @@ package dev.twitchpatches.extension.ui;
 import android.app.Activity;
 import android.app.Application;
 import android.content.pm.ActivityInfo;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,9 +15,24 @@ import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks {
-    private final WeakHashMap<Activity, Session> sessions = new WeakHashMap<>();
+    private static final WeakHashMap<Activity, Session> sessions = new WeakHashMap<>();
 
     static void initialize(Application app) { app.registerActivityLifecycleCallbacks(new UiFullscreenPolicy()); }
+
+    static int filterInsets(View view, int types) {
+        Context context = view.getContext();
+        for (int depth = 0; depth < 16; depth++) {
+            if (context instanceof Activity) {
+                Session session = sessions.get((Activity) context);
+                return session == null ? types : UiInsetTypes.filter(types, session.hideStatus, session.hideNavigation);
+            }
+            if (!(context instanceof ContextWrapper)) break;
+            Context base = ((ContextWrapper) context).getBaseContext();
+            if (base == context) break;
+            context = base;
+        }
+        return types;
+    }
 
     @Override public void onActivityResumed(Activity activity) {
         if (!activity.getClass().getName().equals("tv.twitch.android.feature.viewer.landing.ViewerLandingActivity")) return;
@@ -37,6 +54,8 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
         private final UiSystemBars bars = new UiSystemBars();
         private int cutout;
         private boolean extended;
+        private boolean hideStatus;
+        private boolean hideNavigation;
 
         Session(Activity activity) { reference = new WeakReference<>(activity); }
 
@@ -81,6 +100,9 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
 
         private void apply(Window window, boolean status, boolean navigation) {
             View decor = window.getDecorView();
+            boolean changed = status != hideStatus || navigation != hideNavigation;
+            hideStatus = status;
+            hideNavigation = navigation;
             int requested = (status ? View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN : 0) |
                     (navigation ? View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY : 0);
             int current = decor.getSystemUiVisibility();
@@ -95,6 +117,7 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
                 }
                 extended = status;
             }
+            if (changed) decor.requestApplyInsets();
         }
     }
 }

@@ -17,6 +17,10 @@ Subscribe and gifting distinguish the Vertical View header from channel actions
 below the video. Leaderboard is available on versions that include the button;
 casting settings apply wherever Twitch makes casting available.
 
+Hide status bar also removes Twitch's reserved camera-cutout padding during
+landscape fullscreen playback. Keyboard insets remain active. Leaving fullscreen
+or disabling the setting restores Twitch's normal inset handling.
+
 Group switches derive their state from the location preferences and show how many
 are hidden. Existing preferences are retained. Hidden controls are removed from
 their native constraint chain or action row, so remaining controls retain their

@@ -50,6 +50,10 @@ public final class UiSettings implements SettingGroup {
 
     public static boolean hasLeaderboardButton() { return false; }
 
+    public static int filterWindowInsetTypes(android.view.View view, int types) {
+        return UiFullscreenPolicy.filterInsets(view, types);
+    }
+
     public static AutoCloseable observe(Runnable listener) { return requireInstance().features.observe(listener); }
 
     public static String snapshot() {

@@ -685,7 +685,7 @@
   },
   "uiSettings": {
     "date": "2026-10-11",
-    "javaKotlinTests": 222,
+    "javaKotlinTests": 227,
     "javaScriptTests": 36,
     "entryPoints": [
       "Patch settings",
@@ -729,8 +729,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "a7850a887f7d88c3993107e49c63c20949f5dc5f6b1a99e188eced664b96885c",
-        "apkSha256": "9fa3b6bf5f041bcd3e9b613860f8b02d4b0f57cc3b98c3bd35d98d1942990d01",
+        "bundleSha256": "904397b5a70f9f711959629486538cd65b5f3c3033ce7f5a2023920b41de5942",
+        "apkSha256": "e4e13219b5eea94b6563dc5b0c270a28f9a6aefac2bf0a4f3d3772c6f725691b",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -748,8 +748,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "a7850a887f7d88c3993107e49c63c20949f5dc5f6b1a99e188eced664b96885c",
-        "apkSha256": "c8b56ca3ac89b25d6d3579b56419b9a7e5b480aea966e71ad4c369ee5291c3cd",
+        "bundleSha256": "904397b5a70f9f711959629486538cd65b5f3c3033ce7f5a2023920b41de5942",
+        "apkSha256": "19bef77f46d85145afc974ff91ad53e111b786aa8dcf938017eb4f5193f39bcb",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -769,7 +769,8 @@
       "managerApkBuild": "Previous bundle failed with a 1024 MB heap in Manager 1.35.0 / patcher 1.15.1; corrected bundle awaits device build",
       "installation": "not performed",
       "runtimeUiChecks": "pending",
-      "managerRerun": "pending; no ADB device connected"
+      "managerRerun": "pending; no ADB device connected",
+      "cutoutGeometry": "Pending real or simulated cutout verification; no ADB device connected"
     },
     "regressionChecks": [
       "All 17 customization options default to off on 31.5.2; unavailable Leaderboard controls are excluded on 31.4.2",
@@ -796,9 +797,12 @@
       "Emitted adapters match source; the compiled header capability matches the original APK",
       "Feature masters update every applicable location once and leave other controls unchanged",
       "Existing mixed preferences survive feature-based navigation; no layout-first groups remain",
-      "Search combines control names with location labels and fullscreen descriptions"
+      "Search combines control names with location labels and fullscreen descriptions",
+      "Fullscreen status override excludes cutout padding while retaining keyboard and visible navigation insets",
+      "Leaving fullscreen or disabling system-bar overrides restores the original inset type mask",
+      "Viewer inset injection preserves parameter registers, original query and instruction labels in both supported versions"
     ],
-    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated settings navigation, header controls, V2 menu entries and Manager build remain pending device acceptance.",
+    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Settings navigation, header controls, V2 menu entries, fullscreen cutout geometry and Manager build remain pending device acceptance.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -847,6 +851,18 @@
       "defaults": "Off for fresh preferences; existing Subscribe and Gift preferences retained",
       "desktopChecks": "Full rebuild and original-aware SDK verification passed for both supported versions at a 1024 MB patcher heap",
       "deviceChecks": "Pending; no ADB device connected"
+    },
+    "fullscreenCutout": {
+      "date": "2026-10-11",
+      "versions": [
+        "31.5.2",
+        "31.4.2"
+      ],
+      "hook": "Viewer layout inset listener; inset types filtered before the original padding calculation",
+      "scope": "Landscape fullscreen with Hide status bar enabled; portrait and disabled-state inset handling unchanged",
+      "lifecycle": "Window insets requested again when overrides change, including leaving fullscreen and activity pause",
+      "desktopChecks": "Full DEX rebuild and original-aware SDK checks passed at a 1024 MB patcher heap; compiled bridge present in both output APKs",
+      "deviceChecks": "Pending cutout geometry, orientation, keyboard and toggle verification"
     }
   }
 }
