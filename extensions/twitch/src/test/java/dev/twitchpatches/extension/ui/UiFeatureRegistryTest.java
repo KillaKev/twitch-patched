@@ -1,7 +1,10 @@
 package dev.twitchpatches.extension.ui;
 
 import dev.twitchpatches.extension.settings.ToggleSetting;
+import dev.twitchpatches.extension.settings.SettingEntry;
+import dev.twitchpatches.extension.settings.SettingGroup;
 import dev.twitchpatches.extension.settings.SettingSection;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -107,13 +110,16 @@ public class UiFeatureRegistryTest {
         assertFalse(registry.snapshot().containsKey("all"));
     }
 
-    @Test public void catalogueKeepsLayoutsIndependentAndEveryOptionOff() {
+    @Test public void catalogueGroupsControlsByPurposeAndEveryOptionIsOff() {
         UiFeatureRegistry registry = registry();
         var categories = UiOptions.create(registry, true);
         assertEquals(8, categories.size());
-        assertEquals(java.util.List.of(SettingSection.PLAYER_CONTROLS, SettingSection.CHANNEL_ACTIONS, SettingSection.FULLSCREEN),
+        assertEquals(java.util.List.of(SettingSection.PLAYER_CONTROLS, SettingSection.CHANNEL_ACTIONS, SettingSection.DISPLAY),
                 categories.stream().map(option -> option.section()).distinct().collect(java.util.stream.Collectors.toList()));
         assertTrue(categories.stream().allMatch(option -> !option.title().isEmpty() && !option.icon().isEmpty()));
+        assertTrue(categories.stream().noneMatch(option -> option.title().contains("Classic") || option.title().contains("Vertical")));
+        assertEquals("ic_clip", group(categories, "ui_clip").icon());
+        assertEquals("ic_subscribe", group(categories, "ui_subscribe").icon());
         assertEquals(17, registry.options().size());
         assertTrue(registry.options().stream().noneMatch(ToggleSetting::isEnabled));
         ToggleSetting classic = registry.options().stream().filter(option -> option.key().equals("classic_support_hide_bits")).findFirst().orElseThrow();
@@ -130,8 +136,8 @@ public class UiFeatureRegistryTest {
         assertTrue(registry.enabled("classic_support_hide_bits"));
         assertFalse(registry.enabled("vertical_support_hide_bits"));
         assertTrue(registry.enabled("fullscreen_hide_status_bar"));
-        ToggleSetting bars = (ToggleSetting) categories.get(5);
-        assertEquals("Hide both system bars", bars.title());
+        ToggleSetting bars = master(categories, "ui_system_bars");
+        assertEquals("Hide both bars", bars.title());
         assertEquals("1 of 2 hidden.", bars.summary());
         assertFalse(bars.isEnabled());
         bars.setEnabled(true);
@@ -141,27 +147,73 @@ public class UiFeatureRegistryTest {
         assertTrue(registry.enabled("classic_support_hide_bits"));
     }
 
-    @Test public void headerControlsAreIndependentAndUnsupportedButtonsAreExcluded() {
+    @Test public void featureMasterCombinesAllLocationsAndKeepsOtherControlsIndependent() {
         UiFeatureRegistry registry = registry();
         var groups = UiOptions.create(registry, true);
-        var header = (dev.twitchpatches.extension.settings.SettingGroup) groups.get(4);
-        ToggleSetting all = (ToggleSetting) header.children().get(0);
-        assertEquals("Hide all header buttons", all.title());
+        ToggleSetting all = master(groups, "ui_gift");
+        assertEquals("Hide everywhere", all.title());
         assertFalse(all.isEnabled());
         registry.options().stream().filter(option -> option.key().equals("vertical_header_hide_gift"))
                 .findFirst().orElseThrow().setEnabled(true);
         assertFalse(registry.enabled("vertical_header_hide_leaderboard"));
         assertFalse(registry.enabled("vertical_support_hide_gift"));
         assertEquals("1 of 3 hidden.", all.summary());
+        AtomicInteger changes = new AtomicInteger();
+        registry.observe(() -> {
+            assertEquals(registry.enabled("classic_support_hide_gift"), registry.enabled("vertical_support_hide_gift"));
+            assertEquals(registry.enabled("classic_support_hide_gift"), registry.enabled("vertical_header_hide_gift"));
+            changes.incrementAndGet();
+        });
         all.setEnabled(true);
-        assertTrue(registry.enabled("vertical_header_hide_leaderboard"));
-        assertFalse(registry.enabled("classic_support_hide_gift"));
+        assertTrue(registry.enabled("vertical_header_hide_gift"));
+        assertTrue(registry.enabled("vertical_support_hide_gift"));
+        assertTrue(registry.enabled("classic_support_hide_gift"));
+        assertFalse(registry.enabled("vertical_header_hide_leaderboard"));
+        assertFalse(registry.enabled("classic_support_hide_subscribe"));
+        assertEquals(1, changes.get());
         all.setEnabled(false);
         assertFalse(registry.enabled("vertical_header_hide_gift"));
         assertFalse(registry.enabled("vertical_header_hide_leaderboard"));
+        assertEquals(2, changes.get());
+        assertFalse(saved.containsKey("ui_gift_all"));
+    }
+
+    @Test public void unavailableLeaderboardIsExcludedAndLocationPreferencesRemainIndependent() {
         UiFeatureRegistry previous = registry();
-        UiOptions.create(previous, false);
+        var groups = UiOptions.create(previous, false);
+        assertEquals(7, groups.size());
         assertEquals(16, previous.options().size());
         assertFalse(previous.snapshot().containsKey("vertical_header_hide_leaderboard"));
+        SettingGroup subscribe = group(groups, "ui_subscribe");
+        assertEquals(4, subscribe.children().size());
+        ((ToggleSetting) subscribe.children().get(3)).setEnabled(true);
+        assertFalse(master(groups, "ui_subscribe").isEnabled());
+        assertFalse(previous.enabled("vertical_support_hide_subscribe"));
+        assertFalse(previous.enabled("classic_support_hide_subscribe"));
+        assertTrue(previous.enabled("vertical_header_hide_subscribe"));
+        master(groups, "ui_subscribe").setEnabled(false);
+        assertFalse(previous.enabled("vertical_header_hide_subscribe"));
+    }
+
+    @Test public void playerFeatureMasterRetainsSavedStateAndOnlyChangesItsLocations() {
+        saved.put("classic_controls_hide_clip", true);
+        UiFeatureRegistry registry = registry();
+        var groups = UiOptions.create(registry, true);
+        assertEquals("1 of 2 hidden.", master(groups, "ui_clip").summary());
+        master(groups, "ui_clip").setEnabled(true);
+        assertTrue(registry.enabled("classic_controls_hide_clip"));
+        assertTrue(registry.enabled("vertical_controls_hide_clip"));
+        assertFalse(registry.enabled("classic_controls_hide_cast"));
+        master(groups, "ui_clip").setEnabled(false);
+        assertFalse(registry.enabled("classic_controls_hide_clip"));
+        assertFalse(registry.enabled("vertical_controls_hide_clip"));
+    }
+
+    private static SettingGroup group(List<SettingEntry> groups, String key) {
+        return (SettingGroup) groups.stream().filter(entry -> entry.key().equals(key)).findFirst().orElseThrow();
+    }
+
+    private static ToggleSetting master(List<SettingEntry> groups, String key) {
+        return (ToggleSetting) group(groups, key).children().get(0);
     }
 }

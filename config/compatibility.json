@@ -685,7 +685,7 @@
   },
   "uiSettings": {
     "date": "2026-10-11",
-    "javaKotlinTests": 220,
+    "javaKotlinTests": 222,
     "javaScriptTests": 36,
     "entryPoints": [
       "Patch settings",
@@ -729,8 +729,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "cefb46ed605f93ab85c8772b6966effd54576f2f52a2c8a003cc1b1287cf329d",
-        "apkSha256": "5d8755c4ee535c285a2339d0a18c8a976c9bc312fa10e47f4adeab49fc0cb9d1",
+        "bundleSha256": "a7850a887f7d88c3993107e49c63c20949f5dc5f6b1a99e188eced664b96885c",
+        "apkSha256": "9fa3b6bf5f041bcd3e9b613860f8b02d4b0f57cc3b98c3bd35d98d1942990d01",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -748,8 +748,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "cefb46ed605f93ab85c8772b6966effd54576f2f52a2c8a003cc1b1287cf329d",
-        "apkSha256": "0253704edda69973c7980ec3439fefcf91a070b458f9b07f025ac062ff8412f9",
+        "bundleSha256": "a7850a887f7d88c3993107e49c63c20949f5dc5f6b1a99e188eced664b96885c",
+        "apkSha256": "c8b56ca3ac89b25d6d3579b56419b9a7e5b480aea966e71ad4c369ee5291c3cd",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -793,9 +793,12 @@
       "Header and channel action preferences remain independent; existing Subscribe and Gift preferences migrate",
       "V2 playback and chat sheets expose one UI settings entry and retain close actions and report dialogs",
       "UI navigation coexists with DJ controls in either adapter registration order",
-      "Emitted adapters match source; the compiled header capability matches the original APK"
+      "Emitted adapters match source; the compiled header capability matches the original APK",
+      "Feature masters update every applicable location once and leave other controls unchanged",
+      "Existing mixed preferences survive feature-based navigation; no layout-first groups remain",
+      "Search combines control names with location labels and fullscreen descriptions"
     ],
-    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated header controls, V2 menu entries and Manager build remain pending device acceptance.",
+    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated settings navigation, header controls, V2 menu entries and Manager build remain pending device acceptance.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -814,13 +817,24 @@
       "categories": [
         "Player controls",
         "Channel actions",
-        "Fullscreen"
+        "Display"
       ],
-      "search": "Available on every page; results include category and layout paths and directly editable switches",
+      "search": "Available on every page; feature and location terms find directly editable switches with category and control breadcrumbs",
       "nativeResources": "Search theme and all row icons found in both supported original APKs",
       "preferenceMigration": "Existing keys retained; new header Subscribe and Gift preferences inherit the previous action preferences when absent",
       "desktopEvaluations": "Full APK rebuild and original-aware SDK checks passed at a 1024 MB patcher heap",
-      "deviceAcceptance": "Pending: layout, light/dark themes, keyboard, touch and Back behavior; no device connected"
+      "deviceAcceptance": "Pending: layout, light/dark themes, keyboard, touch and Back behavior; no device connected",
+      "controls": [
+        "Clip button",
+        "Cast button",
+        "Share button",
+        "Subscribe button",
+        "Gift buttons",
+        "Bits button",
+        "Hide leaderboard button",
+        "System bars"
+      ],
+      "grouping": "One page per control; Hide everywhere updates its location preferences atomically. Location switches remain independent; system bars have a Hide both bars switch."
     },
     "verticalHeader": {
       "date": "2026-10-11",

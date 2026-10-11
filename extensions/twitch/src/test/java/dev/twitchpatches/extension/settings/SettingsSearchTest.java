@@ -7,17 +7,17 @@ import static org.junit.Assert.*;
 
 public class SettingsSearchTest {
     @Test public void matchesWordsAcrossLabelsAndLayoutPaths() {
-        ToggleSetting classic = toggle("classic_bits", "Hide Bits button", "");
-        ToggleSetting vertical = toggle("vertical_bits", "Hide Bits button", "");
-        List<SettingEntry> catalog = List.of(group("classic", "Classic Split actions", List.of(classic)),
-                group("vertical", "Vertical View actions", List.of(vertical)));
+        ToggleSetting classic = toggle("classic_bits", "Hide in Classic Split", "Includes fullscreen playback.");
+        ToggleSetting vertical = toggle("vertical_bits", "Hide in Vertical View", "");
+        List<SettingEntry> catalog = List.of(group("bits", "Bits button", List.of(classic, vertical)));
         List<SettingsSearch.Result> results = SettingsSearch.find(catalog, "  VERTICAL   bits ", "");
         assertEquals(1, results.size());
         assertSame(vertical, results.get(0).entry);
-        assertEquals("Interface / Vertical View actions", results.get(0).context);
+        assertEquals("Interface / Bits button", results.get(0).context);
         ((ToggleSetting) results.get(0).entry).setEnabled(true);
         assertTrue(vertical.isEnabled());
         assertFalse(classic.isEnabled());
+        assertSame(classic, SettingsSearch.find(catalog, "bits fullscreen", "").get(0).entry);
     }
 
     @Test public void prioritizesExactLabelsAndRetainsStableOrder() {
@@ -49,14 +49,14 @@ public class SettingsSearchTest {
             @Override public String key() { return "master"; }
             @Override public String title() { return "Hide both system bars"; }
             @Override public String summary() { return enabled ? "All hidden." : "All visible."; }
-            @Override public SettingSection section() { return SettingSection.FULLSCREEN; }
+            @Override public SettingSection section() { return SettingSection.DISPLAY; }
             @Override public boolean isEnabled() { return enabled; }
             @Override public void setEnabled(boolean value) { enabled = value; }
         };
         SettingsSearch.Result result = SettingsSearch.find(List.of(toggle), "system bars", "").get(0);
-        assertEquals("Fullscreen\nAll visible.", result.summary());
+        assertEquals("Display\nAll visible.", result.summary());
         toggle.setEnabled(true);
-        assertEquals("Fullscreen\nAll hidden.", result.summary());
+        assertEquals("Display\nAll hidden.", result.summary());
     }
 
     @Test public void excludesFeaturesOutsideTheProvidedCatalog() {

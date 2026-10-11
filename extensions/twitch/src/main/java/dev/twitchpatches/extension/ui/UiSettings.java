@@ -73,7 +73,7 @@ public final class UiSettings implements SettingGroup {
 
     @Override public String key() { return KEY; }
     @Override public String title() { return "UI settings"; }
-    @Override public String summary() { return "Player controls, channel actions and fullscreen."; }
+    @Override public String summary() { return "Player controls, channel actions and display options."; }
     @Override public String emptyMessage() { return "No UI options are available in this build."; }
     @Override public SettingSection section() { return SettingSection.INTERFACE; }
     @Override public List<SettingEntry> children() { return categories; }

@@ -9,7 +9,7 @@ public enum SettingSection {
     PROMOTIONS("Promotions", "ic_subscribe"),
     PLAYER_CONTROLS("Player controls", "ic_settings"),
     CHANNEL_ACTIONS("Channel actions", "ic_subscribe"),
-    FULLSCREEN("Fullscreen", "ic_fullscreen_enter");
+    DISPLAY("Display", "ic_fullscreen_enter");
 
     private final String title;
     private final String icon;

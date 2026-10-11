@@ -1,27 +1,26 @@
 # UI settings
 
 UI settings are available through Patch settings, live player settings and V2
-chat settings. All
-customization options are off by default and take effect without restarting Twitch.
+chat settings. All customization options are off by default and take effect
+without restarting Twitch.
 
-Options are grouped by function, with separate Classic Split and Vertical View
-settings for each layout:
+Options are organized by the control being changed:
 
 - Player controls: Clip, Cast and Share.
-- Channel actions: Subscribe, Gift a Sub and Bits.
-- Vertical View header: Subscribe, Gift and Leaderboard. Leaderboard controls are available
-  on versions that include this button.
-- Fullscreen: status bar, navigation bar and camera cutout behavior.
+- Channel actions: Subscribe, gifting, Bits and Leaderboard.
+- Display: Android status and navigation bars during landscape fullscreen playback.
 
-Player and channel groups include a switch for all buttons and individual
-switches. Group switches show whether all, some or none of their controls are
-hidden. Hidden controls are removed from their native
-constraint chain or action row, so remaining controls retain their order and
-alignment. Fullscreen settings control Android system bars and use of the camera
-cutout area during landscape playback.
+Controls with multiple locations have one settings page with a Hide everywhere
+switch and individual
+location switches. Classic Split settings also cover fullscreen playback.
+Subscribe and gifting distinguish the Vertical View header from channel actions
+below the video. Leaderboard is available on versions that include the button;
+casting settings apply wherever Twitch makes casting available.
 
-Header settings are independent of the channel actions below the video. Existing
-Subscribe and Gift preferences are retained when upgrading from the combined action group.
+Group switches derive their state from the location preferences and show how many
+are hidden. Existing preferences are retained. Hidden controls are removed from
+their native constraint chain or action row, so remaining controls retain their
+order and alignment.
 
 Search is available on every Patch settings page and covers the included patches.
 Results show their category and layout, and switches can be changed directly.
