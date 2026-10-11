@@ -8,6 +8,8 @@ import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 import dev.twitchpatches.patches.twitch.shared.code
@@ -46,6 +48,22 @@ class UiSettingsHooksTest {
         assertThrows(IllegalArgumentException::class.java) { validateUiPlayerLayout(layout("<LinearLayout/>")) }
         assertThrows(IllegalArgumentException::class.java) { validateUiPlayerLayout(layout("<FrameLayout/>")) }
         assertThrows(IllegalArgumentException::class.java) { validateUiPlayerLayout(layout("<LinearLayout/><LinearLayout/>")) }
+    }
+
+    @Test fun headerCapabilityRetainsItsReturnRegisterAndRejectsChangedStubs() {
+        val method = ImmutableMethod("Lsynthetic/Ui;", "hasLeaderboardButton", emptyList(), "Z",
+            AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, null, null, MutableMethodImplementation(2)).toMutable()
+        method.addInstructionsWithLabels(0, "const/4 v1, 0x0\nreturn v1")
+        for (available in listOf(true, false)) {
+            injectUiHeaderCapability(method, available)
+            val code = method.code()
+            assertEquals(if (available) 1 else 0, (code[0] as NarrowLiteralInstruction).narrowLiteral)
+            assertEquals(1, (code[0] as OneRegisterInstruction).registerA)
+            assertEquals(1, (code[1] as OneRegisterInstruction).registerA)
+            assertEquals(Opcode.RETURN, code[1].opcode)
+        }
+        method.addInstructionsWithLabels(0, "nop")
+        assertThrows(IllegalArgumentException::class.java) { injectUiHeaderCapability(method, true) }
     }
 
     private fun layout(body: String) = """

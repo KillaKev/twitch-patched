@@ -1,6 +1,7 @@
 # UI settings
 
-UI settings are available through Patch settings and live player settings. All
+UI settings are available through Patch settings, live player settings and V2
+chat settings. All
 customization options are off by default and take effect without restarting Twitch.
 
 Options are grouped by function, with separate Classic Split and Vertical View
@@ -8,6 +9,8 @@ settings for each layout:
 
 - Player controls: Clip, Cast and Share.
 - Channel actions: Subscribe, Gift a Sub and Bits.
+- Vertical View header: Subscribe, Gift and Leaderboard. Leaderboard controls are available
+  on versions that include this button.
 - Fullscreen: status bar, navigation bar and camera cutout behavior.
 
 Player and channel groups include a switch for all buttons and individual
@@ -16,6 +19,9 @@ hidden. Hidden controls are removed from their native
 constraint chain or action row, so remaining controls retain their order and
 alignment. Fullscreen settings control Android system bars and use of the camera
 cutout area during landscape playback.
+
+Header settings are independent of the channel actions below the video. Existing
+Subscribe and Gift preferences are retained when upgrading from the combined action group.
 
 Search is available on every Patch settings page and covers the included patches.
 Results show their category and layout, and switches can be changed directly.

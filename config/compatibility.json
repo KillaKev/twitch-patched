@@ -684,13 +684,14 @@
     "scope": "Picker checks on one Android device. Load times depend on provider connectivity; large-catalog scrolling remains a normal-use acceptance check."
   },
   "uiSettings": {
-    "date": "2026-10-10",
-    "javaKotlinTests": 218,
-    "javaScriptTests": 33,
+    "date": "2026-10-11",
+    "javaKotlinTests": 220,
+    "javaScriptTests": 36,
     "entryPoints": [
       "Patch settings",
       "Native player settings",
-      "V2 player settings"
+      "V2 player settings",
+      "V2 chat settings"
     ],
     "customizationDefaults": "disabled",
     "registeredOptions": [
@@ -707,7 +708,10 @@
       "vertical_support_hide_gift",
       "vertical_support_hide_bits",
       "fullscreen_hide_status_bar",
-      "fullscreen_hide_navigation_bar"
+      "fullscreen_hide_navigation_bar",
+      "vertical_header_hide_subscribe",
+      "vertical_header_hide_gift",
+      "vertical_header_hide_leaderboard"
     ],
     "evaluations": [
       {
@@ -725,8 +729,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "aef37bee98d9971396837b84e508459f32f56b8af595e7ce1cf5eea41808841d",
-        "apkSha256": "3e815b36e48272b423024bc37a0e9a2272fa8f603fdd10482b3344175babba3d",
+        "bundleSha256": "cefb46ed605f93ab85c8772b6966effd54576f2f52a2c8a003cc1b1287cf329d",
+        "apkSha256": "5d8755c4ee535c285a2339d0a18c8a976c9bc312fa10e47f4adeab49fc0cb9d1",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -734,7 +738,8 @@
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
         "deviceVerification": "Runtime UI checks pending",
-        "heapMb": 1024
+        "heapMb": 1024,
+        "date": "2026-10-11"
       },
       {
         "versionName": "31.4.2",
@@ -743,8 +748,8 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "aef37bee98d9971396837b84e508459f32f56b8af595e7ce1cf5eea41808841d",
-        "apkSha256": "ee29aec871be4373e9144290703f631a688b331cfb6a8b76d940a6d36ac1d783",
+        "bundleSha256": "cefb46ed605f93ab85c8772b6966effd54576f2f52a2c8a003cc1b1287cf329d",
+        "apkSha256": "0253704edda69973c7980ec3439fefcf91a070b458f9b07f025ac062ff8412f9",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "latestBundleOutputComparison": "Evaluated with current bundle",
@@ -752,7 +757,8 @@
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
         "deviceVerification": "Runtime UI checks pending",
-        "heapMb": 1024
+        "heapMb": 1024,
+        "date": "2026-10-11"
       }
     ],
     "androidVerification": {
@@ -766,7 +772,7 @@
       "managerRerun": "pending; no ADB device connected"
     },
     "regressionChecks": [
-      "All 14 customization options default to off and persist independently",
+      "All 17 customization options default to off on 31.5.2; unavailable Leaderboard controls are excluded on 31.4.2",
       "Group switches derive mixed state and notify once after updating all members",
       "Classic Split and Vertical View use independent preferences",
       "Nested Back navigation restores the previous group and scroll position",
@@ -782,9 +788,14 @@
       "Search handles a 100-option catalog and ranks exact labels first",
       "Search permits existing group/master key overlap and rejects duplicate entries and cycles",
       "Back and saved state retain search queries and result positions; clearing search restores browsing position",
-      "Reorganized categories retain saved preferences and contextual group switches"
+      "Reorganized categories retain saved preferences and contextual group switches",
+      "Vertical header controls preserve Follow, callbacks and layout while removing empty rows",
+      "Header and channel action preferences remain independent; existing Subscribe and Gift preferences migrate",
+      "V2 playback and chat sheets expose one UI settings entry and retain close actions and report dialogs",
+      "UI navigation coexists with DJ controls in either adapter registration order",
+      "Emitted adapters match source; the compiled header capability matches the original APK"
     ],
-    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated Manager build and runtime settings UX acceptance remain pending.",
+    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Updated header controls, V2 menu entries and Manager build remain pending device acceptance.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -799,7 +810,7 @@
       "regression": "Only methods with matching calls become mutable; invocation formats, registers and original methods are preserved"
     },
     "settingsUx": {
-      "date": "2026-10-10",
+      "date": "2026-10-11",
       "categories": [
         "Player controls",
         "Channel actions",
@@ -807,9 +818,21 @@
       ],
       "search": "Available on every page; results include category and layout paths and directly editable switches",
       "nativeResources": "Search theme and all row icons found in both supported original APKs",
-      "preferenceMigration": "Not required; all existing option keys are retained",
+      "preferenceMigration": "Existing keys retained; new header Subscribe and Gift preferences inherit the previous action preferences when absent",
       "desktopEvaluations": "Full APK rebuild and original-aware SDK checks passed at a 1024 MB patcher heap",
       "deviceAcceptance": "Pending: layout, light/dark themes, keyboard, touch and Back behavior; no device connected"
+    },
+    "verticalHeader": {
+      "date": "2026-10-11",
+      "controls": [
+        "Subscribe",
+        "Gift",
+        "Leaderboard"
+      ],
+      "availability": "Determined from the original header component; Leaderboard exists in 31.5.2 and is omitted on 31.4.2",
+      "defaults": "Off for fresh preferences; existing Subscribe and Gift preferences retained",
+      "desktopChecks": "Full rebuild and original-aware SDK verification passed for both supported versions at a 1024 MB patcher heap",
+      "deviceChecks": "Pending; no ADB device connected"
     }
   }
 }

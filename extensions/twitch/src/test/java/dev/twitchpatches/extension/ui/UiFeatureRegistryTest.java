@@ -109,12 +109,12 @@ public class UiFeatureRegistryTest {
 
     @Test public void catalogueKeepsLayoutsIndependentAndEveryOptionOff() {
         UiFeatureRegistry registry = registry();
-        var categories = UiOptions.create(registry);
-        assertEquals(7, categories.size());
+        var categories = UiOptions.create(registry, true);
+        assertEquals(8, categories.size());
         assertEquals(java.util.List.of(SettingSection.PLAYER_CONTROLS, SettingSection.CHANNEL_ACTIONS, SettingSection.FULLSCREEN),
                 categories.stream().map(option -> option.section()).distinct().collect(java.util.stream.Collectors.toList()));
         assertTrue(categories.stream().allMatch(option -> !option.title().isEmpty() && !option.icon().isEmpty()));
-        assertEquals(14, registry.options().size());
+        assertEquals(17, registry.options().size());
         assertTrue(registry.options().stream().noneMatch(ToggleSetting::isEnabled));
         ToggleSetting classic = registry.options().stream().filter(option -> option.key().equals("classic_support_hide_bits")).findFirst().orElseThrow();
         classic.setEnabled(true);
@@ -126,11 +126,11 @@ public class UiFeatureRegistryTest {
         saved.put("classic_support_hide_bits", true);
         saved.put("fullscreen_hide_status_bar", true);
         UiFeatureRegistry registry = registry();
-        var categories = UiOptions.create(registry);
+        var categories = UiOptions.create(registry, true);
         assertTrue(registry.enabled("classic_support_hide_bits"));
         assertFalse(registry.enabled("vertical_support_hide_bits"));
         assertTrue(registry.enabled("fullscreen_hide_status_bar"));
-        ToggleSetting bars = (ToggleSetting) categories.get(4);
+        ToggleSetting bars = (ToggleSetting) categories.get(5);
         assertEquals("Hide both system bars", bars.title());
         assertEquals("1 of 2 hidden.", bars.summary());
         assertFalse(bars.isEnabled());
@@ -139,5 +139,29 @@ public class UiFeatureRegistryTest {
         bars.setEnabled(false);
         assertFalse(registry.enabled("fullscreen_hide_status_bar"));
         assertTrue(registry.enabled("classic_support_hide_bits"));
+    }
+
+    @Test public void headerControlsAreIndependentAndUnsupportedButtonsAreExcluded() {
+        UiFeatureRegistry registry = registry();
+        var groups = UiOptions.create(registry, true);
+        var header = (dev.twitchpatches.extension.settings.SettingGroup) groups.get(4);
+        ToggleSetting all = (ToggleSetting) header.children().get(0);
+        assertEquals("Hide all header buttons", all.title());
+        assertFalse(all.isEnabled());
+        registry.options().stream().filter(option -> option.key().equals("vertical_header_hide_gift"))
+                .findFirst().orElseThrow().setEnabled(true);
+        assertFalse(registry.enabled("vertical_header_hide_leaderboard"));
+        assertFalse(registry.enabled("vertical_support_hide_gift"));
+        assertEquals("1 of 3 hidden.", all.summary());
+        all.setEnabled(true);
+        assertTrue(registry.enabled("vertical_header_hide_leaderboard"));
+        assertFalse(registry.enabled("classic_support_hide_gift"));
+        all.setEnabled(false);
+        assertFalse(registry.enabled("vertical_header_hide_gift"));
+        assertFalse(registry.enabled("vertical_header_hide_leaderboard"));
+        UiFeatureRegistry previous = registry();
+        UiOptions.create(previous, false);
+        assertEquals(16, previous.options().size());
+        assertFalse(previous.snapshot().containsKey("vertical_header_hide_leaderboard"));
     }
 }

@@ -102,7 +102,7 @@ test('vertical support hosts mark their own rows and leave unrelated children un
     const Row = () => {}, unrelated = e('Button', {});
     f.modules.SupportActionRow = Row;
     const tree = e('View', {children: [unrelated, e(Row, {buttons: []})]});
-    const render = f.adapt('SkylineBandActions', () => tree);
+    const render = f.adapt('SkylineSheetActions', () => tree);
     const result = render({});
     assert.equal(result.props.children[0], unrelated);
     assert.equal(result.props.children[1].props.twitchPatchUiLayout, 'vertical');
@@ -114,6 +114,59 @@ test('ambiguous deep trees fail without partially removing controls', () => {
     let tree = e('Button', {testID: 'row-bits'});
     for (let i = 0; i < 40; i++) tree = e('View', {children: tree});
     assert.equal(f.runtime.ui.filterControls(f.React, tree, {bits: true}), tree);
+});
+
+test('vertical header hides Gift and Leaderboard independently and collapses empty action wrappers', () => {
+    const f = fixture(), e = f.React.createElement;
+    const Row = () => {}, Trophy = () => {}, press = () => {};
+    f.modules.SupportActionRow = Row;
+    f.modules.SkylineLeaderboardTrophy = Trophy;
+    const gift = e(Row, {buttons: [{kind: 'gift'}], onOpenSubscribe: press});
+    const trophy = e(Trophy, {});
+    const tree = e('ThemeRegion', {style: {flexDirection: 'row', gap: 4}, children: [gift, trophy]});
+    const render = f.adapt('SkylineBandActions', () => tree);
+    assert.equal(render({}).props.children[1], trophy);
+    f.preferences.vertical_header_hide_leaderboard = true;
+    let result = render({});
+    assert.equal(result.props.children.length, 1);
+    assert.equal(result.props.children[0].props.onOpenSubscribe, press);
+    f.preferences.vertical_header_hide_gift = true;
+    assert.equal(render({}), null);
+    f.preferences.vertical_header_hide_leaderboard = false;
+    result = render({});
+    assert.deepEqual(Array.from(result.props.children), [trophy]);
+    assert.equal(result.props.style, tree.props.style);
+    assert.equal(tree.props.children.length, 2);
+    f.preferences.vertical_header_hide_gift = false;
+    assert.equal(render({}).props.children.length, 2);
+    f.preferences.vertical_support_hide_gift = true;
+    assert.equal(render({}).props.children.length, 2, 'channel action preference does not affect the header');
+    assert.equal(render({}).props.children[0].props.twitchPatchUiLayout, 'vertical_header');
+    f.preferences.vertical_header_hide_leaderboard = true;
+    const leaderboardOnly = e('View', {children: [e(Row, {buttons: []}), trophy]});
+    assert.equal(f.adapt('SkylineBandActions', () => leaderboardOnly)({}), null);
+});
+
+test('header options retain Follow and Subscribe and do not affect other vertical actions', () => {
+    const f = fixture(), e = f.React.createElement, Row = () => {}, Trophy = () => {};
+    f.modules.SupportActionRow = Row;
+    f.modules.SkylineLeaderboardTrophy = Trophy;
+    const buttons = [{kind: 'follow'}, {kind: 'subscribe'}, {kind: 'gift'}];
+    const tree = e('View', {children: [e(Row, {buttons}), e(Trophy, {})]});
+    const header = f.adapt('SkylineBandActions', () => tree);
+    const sheet = f.adapt('SkylineSheetActions', () => tree);
+    f.preferences.vertical_header_hide_gift = true;
+    f.preferences.vertical_header_hide_leaderboard = true;
+    assert.deepEqual(Array.from(header({}).props.children[0].props.buttons, button => button.kind), ['follow', 'subscribe']);
+    assert.equal(sheet({}).props.children[0].props.buttons, buttons);
+    assert.equal(sheet({}).props.children[1], tree.props.children[1]);
+    f.preferences.vertical_support_hide_subscribe = true;
+    assert.deepEqual(Array.from(header({}).props.children[0].props.buttons, button => button.kind), ['follow', 'subscribe']);
+    f.preferences.vertical_header_hide_subscribe = true;
+    assert.deepEqual(Array.from(header({}).props.children[0].props.buttons, button => button.kind), ['follow']);
+    let deep = tree;
+    for (let i = 0; i < 40; i++) deep = e('View', {children: deep});
+    assert.equal(f.adapt('SkylineBandActions', () => deep)({}), deep);
 });
 
 test('UI decorators coexist with the Reload adapter in either registration order', () => {

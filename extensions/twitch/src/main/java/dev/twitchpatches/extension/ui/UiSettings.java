@@ -18,13 +18,19 @@ public final class UiSettings implements SettingGroup {
 
     private UiSettings(Application application) {
         SharedPreferences preferences = application.getSharedPreferences("twitch_patches_ui", 0);
+        // Preserve existing preferences when separating header and channel actions.
+        for (String part : new String[] {"gift", "subscribe"}) {
+            String key = "vertical_header_hide_" + part;
+            if (!preferences.contains(key) && preferences.getBoolean("vertical_support_hide_" + part, false))
+                preferences.edit().putBoolean(key, true).apply();
+        }
         features = new UiFeatureRegistry(new UiFeatureRegistry.Preferences() {
             @Override public boolean read(String key) { return preferences.getBoolean(key, false); }
             @Override public void write(String key, boolean enabled) {
                 preferences.edit().putBoolean(key, enabled).apply();
             }
         });
-        categories = UiOptions.create(features);
+        categories = UiOptions.create(features, hasLeaderboardButton());
         features.observe(() -> { ReactNativeRuntime.refresh(); UiComposeBridge.update(); });
     }
 
@@ -41,6 +47,8 @@ public final class UiSettings implements SettingGroup {
         UiSettings settings = instance;
         return settings != null && settings.features.enabled(key);
     }
+
+    public static boolean hasLeaderboardButton() { return false; }
 
     public static AutoCloseable observe(Runnable listener) { return requireInstance().features.observe(listener); }
 

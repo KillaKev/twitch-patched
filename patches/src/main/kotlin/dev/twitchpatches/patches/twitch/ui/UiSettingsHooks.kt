@@ -9,6 +9,8 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMuta
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
+import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction11n
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -21,6 +23,16 @@ private const val INTENT = "Lcom/facebook/react/modules/intent/IntentModule;"
 private const val RN = "Lcom/facebook/react/runtime/ReactInstance;"
 private const val ARRAY = "Lcom/facebook/react/bridge/WritableNativeArray;"
 private const val RUNTIME = "Ldev/twitchpatches/extension/shared/ReactNativeRuntime;"
+
+internal fun injectUiHeaderCapability(method: MutableMethod, available: Boolean) {
+    val code = method.code()
+    require(code.size == 2 && code[0].opcode == Opcode.CONST_4 && code[1].opcode == Opcode.RETURN &&
+        (code[0] as OneRegisterInstruction).registerA == (code[1] as OneRegisterInstruction).registerA) {
+        "UI settings: header capability stub changed."
+    }
+    requireNotNull(method.implementation).replaceInstruction(0,
+        BuilderInstruction11n(Opcode.CONST_4, (code[0] as OneRegisterInstruction).registerA, if (available) 1 else 0))
+}
 
 internal fun BytecodePatchContext.injectUiPlayerEntry() {
     val models = mutableListOf<String>()

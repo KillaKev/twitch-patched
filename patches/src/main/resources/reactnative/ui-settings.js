@@ -29,24 +29,41 @@
             listeners.forEach(function (listener) { listener(); });
         }};
     });
-    runtime.target(__TWITCH_UI_SHEET_MODULE__, 'BottomSheet', function (original, React, runtime, require) {
-        var Row = require(__TWITCH_UI_ROW_MODULE__).SettingsListItem;
-        var Linking = require(__TWITCH_UI_NATIVE_MODULE__).Linking;
-        function Sheet(props) {
-            var body = props.children;
-            if (!React.isValidElement(body) || body.props.testID !== 'playback-settings-sheet')
-                return React.createElement(original, props);
-            var row = React.createElement(Row, {
-                key: 'twitch-patches-ui-settings', title: 'UI settings', onPress: function () {
-                    if (typeof props.onClose === 'function') props.onClose();
-                    Linking.openURL('twitch-patches://settings/ui').catch(function () { runtime.log('UI navigation failed'); });
-                }, accessibilityRole: 'button', accessibilityLabel: 'UI settings', testID: 'twitch-patches-ui-settings'
-            });
-            var children = React.Children.toArray(body.props.children);
-            children.unshift(row);
-            return React.createElement(original, Object.assign({}, props, {children: React.cloneElement(body, {}, children)}));
-        }
-        Object.assign(Sheet, original);
-        return Sheet;
-    });
+    function settings(module, name) {
+        runtime.decorate(module, name, function (original, React, policy, require) {
+            var Sheet = require(__TWITCH_UI_SHEET_MODULE__).BottomSheet;
+            var Row = require(__TWITCH_UI_ROW_MODULE__).SettingsListItem;
+            var Linking = require(__TWITCH_UI_NATIVE_MODULE__).Linking;
+            return function (props) {
+                var result = original.apply(this, arguments), count = 0, limit = {};
+                function visit(node, depth) {
+                    if (++count > 128 || depth > 16) throw limit;
+                    if (Array.isArray(node)) {
+                        var next = node.map(function (child) { return visit(child, depth + 1); });
+                        return next.every(function (child, index) { return child === node[index]; }) ? node : next;
+                    }
+                    if (!React.isValidElement(node)) return node;
+                    if (node.type === Sheet) {
+                        var children = React.Children.toArray(node.props.children);
+                        if (children.some(function (child) { return React.isValidElement(child) &&
+                            child.props.testID === 'twitch-patches-ui-settings'; })) return node;
+                        children.unshift(React.createElement(Row, {
+                            key: 'twitch-patches-ui-settings', title: 'UI settings', onPress: function () {
+                                if (typeof node.props.onClose === 'function') node.props.onClose();
+                                Linking.openURL('twitch-patches://settings/ui').catch(function () { runtime.log('UI navigation failed'); });
+                            }, accessibilityRole: 'button', accessibilityLabel: 'UI settings', testID: 'twitch-patches-ui-settings'
+                        }));
+                        return React.cloneElement(node, {children: children});
+                    }
+                    if (node.props.children === undefined) return node;
+                    var children = visit(node.props.children, depth + 1);
+                    return children === node.props.children ? node : React.cloneElement(node, {children: children});
+                }
+                try { return visit(result, 0); }
+                catch (error) { if (error !== limit) throw error; runtime.log('UI settings tree limit'); return result; }
+            };
+        });
+    }
+    settings(__TWITCH_UI_PLAYBACK_MODULE__, 'PlaybackSettingsSheet');
+    settings(__TWITCH_UI_CHAT_SETTINGS_MODULE__, 'ChatSettingsSheet');
 })(globalThis);
