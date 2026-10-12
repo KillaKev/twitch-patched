@@ -21,6 +21,13 @@ Hide status bar also removes Twitch's reserved camera-cutout padding during
 landscape fullscreen playback. Keyboard insets remain active. Leaving fullscreen
 or disabling the setting restores Twitch's normal inset handling.
 
+Fullscreen inset handling targets the fullscreen container and checks its owning
+activity's current orientation. Insets can arrive before the first layout callback after rotation.
+Changing a system-bar option reapplies Twitch's padding listener even when Android's
+inset values stay unchanged.
+Run `scripts/test-ui-fullscreen.ps1` with a connected Android device to check
+container scope, rotation and toggle behavior without installing an APK.
+
 Group switches derive their state from the location preferences and show how many
 are hidden. Existing preferences are retained. Hidden controls are removed from
 their native constraint chain or action row, so remaining controls retain their

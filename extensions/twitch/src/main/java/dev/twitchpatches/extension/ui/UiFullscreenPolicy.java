@@ -2,29 +2,36 @@ package dev.twitchpatches.extension.ui;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.ActivityInfo;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks {
     private static final WeakHashMap<Activity, Session> sessions = new WeakHashMap<>();
+    private static String lastDiagnostic;
 
     static void initialize(Application app) { app.registerActivityLifecycleCallbacks(new UiFullscreenPolicy()); }
 
     static int filterInsets(View view, int types) {
+        try {
+            if (!"fullscreen_layout".equals(view.getResources().getResourceEntryName(view.getId()))) return types;
+        } catch (android.content.res.Resources.NotFoundException missing) { return types; }
         Context context = view.getContext();
         for (int depth = 0; depth < 16; depth++) {
             if (context instanceof Activity) {
-                Session session = sessions.get((Activity) context);
-                return session == null ? types : UiInsetTypes.filter(types, session.hideStatus, session.hideNavigation);
+                Activity activity = (Activity) context;
+                Session session = sessions.get(activity);
+                if (session != null) session.container = new WeakReference<>(view);
+                return filterInsets(activity, types);
             }
             if (!(context instanceof ContextWrapper)) break;
             Context base = ((ContextWrapper) context).getBaseContext();
@@ -32,6 +39,20 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
             context = base;
         }
         return types;
+    }
+
+    static int filterInsets(Activity activity, int types) {
+        Session session = sessions.get(activity);
+        boolean active = session != null && session.subscription != null;
+        boolean fullscreen = active && session.fullscreen(activity);
+        int filtered = UiInsetTypes.filter(types, fullscreen && UiSettings.enabled("fullscreen_hide_status_bar"),
+                fullscreen && UiSettings.enabled("fullscreen_hide_navigation_bar"));
+        if (android.util.Log.isLoggable("TwitchPatchesUI", android.util.Log.DEBUG)) {
+            String diagnostic = "active=" + active + ", fullscreen=" + fullscreen + ", mask=" + types + "/" + filtered;
+            if (!diagnostic.equals(lastDiagnostic)) android.util.Log.d("TwitchPatchesUI", "Fullscreen insets: " + diagnostic);
+            lastDiagnostic = diagnostic;
+        }
+        return filtered;
     }
 
     @Override public void onActivityResumed(Activity activity) {
@@ -50,6 +71,7 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
 
     private static final class Session implements android.view.ViewTreeObserver.OnGlobalLayoutListener {
         private final WeakReference<Activity> reference;
+        private WeakReference<View> container = new WeakReference<>(null);
         private AutoCloseable subscription;
         private final UiSystemBars bars = new UiSystemBars();
         private int cutout;
@@ -71,22 +93,28 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
         }
 
         void stop() {
+            if (subscription != null) {
+                try { subscription.close(); }
+                catch (Exception error) { android.util.Log.w("TwitchPatchesUI", "Fullscreen subscription cleanup failed"); }
+                subscription = null;
+            }
             Activity activity = reference.get();
             if (activity != null) {
                 View decor = activity.getWindow().getDecorView();
                 if (decor.getViewTreeObserver().isAlive()) decor.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 apply(activity.getWindow(), false, false);
             }
-            if (subscription != null) {
-                try { subscription.close(); }
-                catch (Exception error) { android.util.Log.w("TwitchPatchesUI", "Fullscreen subscription cleanup failed"); }
-                subscription = null;
-            }
         }
 
         @Override public void onGlobalLayout() {
             Activity activity = reference.get();
-            if (activity == null) return;
+            if (activity == null || subscription == null) return;
+            boolean fullscreen = fullscreen(activity);
+            apply(activity.getWindow(), fullscreen && UiSettings.enabled("fullscreen_hide_status_bar"),
+                    fullscreen && UiSettings.enabled("fullscreen_hide_navigation_bar"));
+        }
+
+        private boolean fullscreen(Activity activity) {
             boolean landscape = activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
             int orientation = activity.getRequestedOrientation();
             boolean player = orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
@@ -94,8 +122,7 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
             Window window = activity.getWindow();
             player |= (window.getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0 ||
                     (bars.hostFlags(window.getDecorView().getSystemUiVisibility()) & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-            apply(window, landscape && player && UiSettings.enabled("fullscreen_hide_status_bar"),
-                    landscape && player && UiSettings.enabled("fullscreen_hide_navigation_bar"));
+            return landscape && player;
         }
 
         private void apply(Window window, boolean status, boolean navigation) {
@@ -117,7 +144,23 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
                 }
                 extended = status;
             }
-            if (changed) decor.requestApplyInsets();
+            if (changed) {
+                decor.requestApplyInsets();
+                refreshInsets();
+            }
+        }
+
+        private void refreshInsets() {
+            View view = container.get();
+            Activity activity = reference.get();
+            if (view == null && activity != null) {
+                int id = activity.getResources().getIdentifier("fullscreen_layout", "id", activity.getPackageName());
+                if (id != 0) view = activity.getWindow().getDecorView().findViewById(id);
+            }
+            if (view == null || !view.isAttachedToWindow()) return;
+            WindowInsets insets = view.getRootWindowInsets();
+            // Preference changes can leave the window insets unchanged while Twitch retains old padding.
+            if (insets != null) view.dispatchApplyWindowInsets(insets);
         }
     }
 }

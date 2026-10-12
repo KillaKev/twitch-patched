@@ -684,7 +684,7 @@
     "scope": "Picker checks on one Android device. Load times depend on provider connectivity; large-catalog scrolling remains a normal-use acceptance check."
   },
   "uiSettings": {
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "javaKotlinTests": 229,
     "javaScriptTests": 36,
     "entryPoints": [
@@ -729,17 +729,17 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "1183c4dd69cc909c6bcd307a2bcf2ce6aa8df6e577891e5438a0a862018b73ea",
-        "apkSha256": "bb98030622148af5c8ec306987e8a453a53e6fce96f58ccfadf0c5f6c9cc597a",
+        "bundleSha256": "8aec4f3fff0ff58427e7967443d16f6211511568711c02c07b2c4e12fca9883f",
+        "apkSha256": "539c880514e1f4b7efc29e2ffadae8eceb6a18170658ef116ea02fbba3543989",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "All unsigned APK entries byte-identical to the previous evaluated build, including eight DEX files and resources",
+        "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Runtime UI checks pending",
+        "deviceVerification": "Live re-enable regression passed on Android ART; phone acceptance pending",
         "heapMb": 1024,
-        "date": "2026-10-11"
+        "date": "2026-10-12"
       },
       {
         "versionName": "31.4.2",
@@ -748,17 +748,17 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "1183c4dd69cc909c6bcd307a2bcf2ce6aa8df6e577891e5438a0a862018b73ea",
-        "apkSha256": "a8ac282d37c707683513a839eb4a34f422a796fc2611b8831baebb80d6c0f315",
+        "bundleSha256": "8aec4f3fff0ff58427e7967443d16f6211511568711c02c07b2c4e12fca9883f",
+        "apkSha256": "7cc0c2d6a471c3502653561c4003b42243f0527ee1d32d7d6b8ad1ec1f485d0f",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "latestBundleOutputComparison": "All unsigned APK entries byte-identical to the previous evaluated build, including eight DEX files and resources",
+        "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Runtime UI checks pending",
+        "deviceVerification": "Live re-enable regression passed on Android ART; phone acceptance pending",
         "heapMb": 1024,
-        "date": "2026-10-11"
+        "date": "2026-10-12"
       }
     ],
     "androidVerification": {
@@ -766,11 +766,11 @@
       "xmlResourceTransformation": "passed using Android DOM and the installed Manager runtime",
       "policyClassLinkage": "passed: six policy classes, 42 methods and six XML view constructors",
       "fullscreenFlagRestoration": "passed in a standalone ART process",
-      "managerApkBuild": "Previous bundle failed with a 1024 MB heap in Manager 1.35.0 / patcher 1.15.1; corrected bundle awaits device build",
-      "installation": "not performed",
-      "runtimeUiChecks": "pending",
-      "managerRerun": "pending; no ADB device connected",
-      "cutoutGeometry": "Pending real or simulated cutout verification; no ADB device connected"
+      "managerApkBuild": "Previous container-hook bundle passed with nine recommended patches and a 1024 MB heap; live-toggle correction rebuilt with Desktop",
+      "installation": "Previous container-hook APK installed with signing key and data retained; live-toggle correction not installed",
+      "runtimeUiChecks": "Initial cutout removal confirmed by tester; live re-enable correction awaits phone testing",
+      "managerRerun": "Previous container-hook build passed on Android 13 with Manager 1.35.0 and patcher 1.15.1; current bundle retest pending",
+      "cutoutGeometry": "Previous Manager APK removes the cutout strip after restart; unchanged-inset toggle regression passes with the correction on Android ART"
     },
     "regressionChecks": [
       "All 17 customization options default to off on 31.5.2; unavailable Leaderboard controls are excluded on 31.4.2",
@@ -800,10 +800,13 @@
       "Search combines control names with location labels and fullscreen descriptions",
       "Fullscreen status override excludes cutout padding while retaining keyboard and visible navigation insets",
       "Leaving fullscreen or disabling system-bar overrides restores the original inset type mask",
-      "Viewer inset injection preserves parameter registers, original query and instruction labels in both supported versions",
-      "Native action caller search traverses each method once, matches exact signatures and deduplicates compact and range invocations"
+      "Fullscreen container injection preserves View and inset registers, both original queries and instruction labels in supported versions",
+      "Native action caller search traverses each method once, matches exact signatures and deduplicates compact and range invocations",
+      "Android ART regression checks the first landscape insets before cached layout flags update",
+      "Inset filtering resolves themed activity contexts, targets only the fullscreen container and preserves other containers, unidentified views, portrait and paused activities",
+      "Native padding refresh handles off-to-on transitions with unchanged insets, preserves keyboard padding and ignores queued layouts after pause"
     ],
-    "scope": "Desktop evaluations within a 1024 MB patcher heap and previous standalone Android parser and DEX checks. Settings navigation, header controls, V2 menu entries, fullscreen cutout geometry and Manager build remain pending device acceptance.",
+    "scope": "Full desktop rebuilds and original-aware SDK checks passed for both supported versions. Android ART confirms live re-enable with unchanged insets; the updated bundle awaits phone acceptance.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -854,16 +857,24 @@
       "deviceChecks": "Pending; no ADB device connected"
     },
     "fullscreenCutout": {
-      "date": "2026-10-11",
+      "date": "2026-10-12",
       "versions": [
         "31.5.2",
         "31.4.2"
       ],
-      "hook": "Viewer layout inset listener; inset types filtered before the original padding calculation",
+      "hook": "Fullscreen container padding listener; both cutout-inclusive and cutout-exclusive queries retain the original padding calculation",
       "scope": "Landscape fullscreen with Hide status bar enabled; portrait and disabled-state inset handling unchanged",
-      "lifecycle": "Window insets requested again when overrides change, including leaving fullscreen and activity pause",
+      "lifecycle": "Filtering is limited to the fullscreen container of the resumed viewer activity; preference changes dispatch the current native insets, pause restores host handling and queued callbacks cannot reapply overrides after pause",
       "desktopChecks": "Full DEX rebuild and original-aware SDK checks passed at a 1024 MB patcher heap; compiled bridge present in both output APKs",
-      "deviceChecks": "Pending cutout geometry, orientation, keyboard and toggle verification"
+      "deviceChecks": "Initial cutout removal confirmed on the previous Manager APK; corrected live-toggle behavior awaits phone acceptance",
+      "liveToggleRegression": {
+        "androidApi": 37,
+        "unchangedInsetsReenable": "passed",
+        "independentTogglesAndKeyboardInsets": "passed",
+        "containerScopeRotationAndPause": "passed",
+        "repeatedLayouts": "passed; no repeated inset dispatch",
+        "previousBundleControl": "failed at re-enable with unchanged native insets"
+      }
     },
     "hookSearch": {
       "date": "2026-10-11",
