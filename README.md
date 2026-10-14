@@ -15,7 +15,7 @@ Patch settings include search across categories and individual options. UI contr
 | Hide Turbo promotions | Hides Twitch Turbo promotions and purchase prompts. |
 | Hide subscription discount banners | Hides subscription offers, discount banners and promotional labels. |
 | Auto-claim bonus channel points | Automatically claims bonus channel points while watching live streams. |
-| BTTV, FFZ and 7TV emotes | Adds global and channel emotes to chat and the emote picker, with animations, provider settings and tap previews. |
+| BTTV, FFZ and 7TV emotes | Adds global and channel emotes to live chat, replay chat and the emote picker, with animations and tap previews. |
 | Reload stream | Reloads live streams with a double-tap control. |
 | UI settings | Controls the visibility of player buttons, channel actions, extensions and fullscreen system bars. |
 | Block client-requested ads | Blocks native player ad requests. Restart Twitch after changing this setting. |
