@@ -18,7 +18,6 @@ public final class UiSettings implements SettingGroup {
 
     private UiSettings(Application application) {
         SharedPreferences preferences = application.getSharedPreferences("twitch_patches_ui", 0);
-        // Preserve existing preferences when separating header and channel actions.
         for (String part : new String[] {"gift", "subscribe"}) {
             String key = "vertical_header_hide_" + part;
             if (!preferences.contains(key) && preferences.getBoolean("vertical_support_hide_" + part, false))

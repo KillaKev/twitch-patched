@@ -684,9 +684,9 @@
     "scope": "Picker checks on one Android device. Load times depend on provider connectivity; large-catalog scrolling remains a normal-use acceptance check."
   },
   "uiSettings": {
-    "date": "2026-10-12",
-    "javaKotlinTests": 229,
-    "javaScriptTests": 36,
+    "date": "2026-10-14",
+    "javaKotlinTests": 234,
+    "javaScriptTests": 38,
     "entryPoints": [
       "Patch settings",
       "Native player settings",
@@ -711,7 +711,10 @@
       "fullscreen_hide_navigation_bar",
       "vertical_header_hide_subscribe",
       "vertical_header_hide_gift",
-      "vertical_header_hide_leaderboard"
+      "vertical_header_hide_leaderboard",
+      "hide_channel_extensions",
+      "classic_support_hide_row",
+      "vertical_support_hide_row"
     ],
     "evaluations": [
       {
@@ -729,17 +732,17 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "8aec4f3fff0ff58427e7967443d16f6211511568711c02c07b2c4e12fca9883f",
-        "apkSha256": "539c880514e1f4b7efc29e2ffadae8eceb6a18170658ef116ea02fbba3543989",
+        "bundleSha256": "6e7c3ef43b7313d1295eee599ca78873b55f08b9481797177327a2a239ef34a1",
+        "apkSha256": "46360e14f59c4c00d4b6e18908c8ac3b95b91c69937237feef469d30c4eee928",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Live re-enable regression passed on Android ART; phone acceptance pending",
+        "deviceVerification": "Android 13 layout and fullscreen policy regressions passed; actual typed action bridge and native button models passed; visual app acceptance pending",
         "heapMb": 1024,
-        "date": "2026-10-12"
+        "date": "2026-10-14"
       },
       {
         "versionName": "31.4.2",
@@ -748,32 +751,32 @@
           "UI settings"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "8aec4f3fff0ff58427e7967443d16f6211511568711c02c07b2c4e12fca9883f",
-        "apkSha256": "7cc0c2d6a471c3502653561c4003b42243f0527ee1d32d7d6b8ad1ec1f485d0f",
+        "bundleSha256": "6e7c3ef43b7313d1295eee599ca78873b55f08b9481797177327a2a239ef34a1",
+        "apkSha256": "77e5b7415262d4860afa59fbaa71a1d2d6003874e93bd05aebd1db0737e5d77a",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
         "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Live re-enable regression passed on Android ART; phone acceptance pending",
+        "deviceVerification": "SDK verification passed; common runtime policy passed on Android 13; visual app acceptance pending",
         "heapMb": 1024,
-        "date": "2026-10-12"
+        "date": "2026-10-14"
       }
     ],
     "androidVerification": {
       "androidApi": 33,
       "xmlResourceTransformation": "passed using Android DOM and the installed Manager runtime",
-      "policyClassLinkage": "passed: six policy classes, 42 methods and six XML view constructors",
+      "policyClassLinkage": "Previous core view constructors verified; ActionRow and extension FrameLayout constructed and exercised on Android 13",
       "fullscreenFlagRestoration": "passed in a standalone ART process",
-      "managerApkBuild": "Previous container-hook bundle passed with nine recommended patches and a 1024 MB heap; live-toggle correction rebuilt with Desktop",
-      "installation": "Previous container-hook APK installed with signing key and data retained; live-toggle correction not installed",
-      "runtimeUiChecks": "Initial cutout removal confirmed by tester; live re-enable correction awaits phone testing",
-      "managerRerun": "Previous container-hook build passed on Android 13 with Manager 1.35.0 and patcher 1.15.1; current bundle retest pending",
-      "cutoutGeometry": "Previous Manager APK removes the cutout strip after restart; unchanged-inset toggle regression passes with the correction on Android ART"
+      "managerApkBuild": "Current UI update rebuilt and audited with Morphe Desktop at a 1024 MB heap; Manager build pending",
+      "installation": "Current UI update not installed; temporary verification processes left the installed app and data unchanged",
+      "runtimeUiChecks": "Standalone Android view policy and actual 31.5.2 action-model bridge passed; installed-app visual acceptance pending",
+      "managerRerun": "Pending for the current UI update",
+      "cutoutGeometry": "Existing fullscreen off-to-on regression passed again on Android 13"
     },
     "regressionChecks": [
-      "All 17 customization options default to off on 31.5.2; unavailable Leaderboard controls are excluded on 31.4.2",
+      "All 20 customization options default to off on 31.5.2; 31.4.2 excludes the unavailable Leaderboard option",
       "Group switches derive mixed state and notify once after updating all members",
       "Classic Split and Vertical View use independent preferences",
       "Nested Back navigation restores the previous group and scroll position",
@@ -804,9 +807,13 @@
       "Native action caller search traverses each method once, matches exact signatures and deduplicates compact and range invocations",
       "Android ART regression checks the first landscape insets before cached layout flags update",
       "Inset filtering resolves themed activity contexts, targets only the fullscreen container and preserves other containers, unidentified views, portrait and paused activities",
-      "Native padding refresh handles off-to-on transitions with unchanged insets, preserves keyboard padding and ignores queued layouts after pause"
+      "Native padding refresh handles off-to-on transitions with unchanged insets, preserves keyboard padding and ignores queued layouts after pause",
+      "Classic action filtering retains original models when unchanged and preserves Follow, unknown actions and the original following state",
+      "Action row overrides preserve individual button preferences and remain independent across Classic Split and Vertical View",
+      "Android view measurement collapses the fixed-height row and divider only when its customized contents are empty; visible titles and restored actions reopen it",
+      "Abstract native button identity contracts resolve without requiring an implementation"
     ],
-    "scope": "Full desktop rebuilds and original-aware SDK checks passed for both supported versions. Android ART confirms live re-enable with unchanged insets; the updated bundle awaits phone acceptance.",
+    "scope": "Full desktop rebuilds and original-aware SDK checks passed for both supported versions. Android 13 policy and native action-model bridge checks passed without installation; Manager build and visual app acceptance remain pending.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -892,6 +899,18 @@
       "matchedCallers": "Identical in all three benchmark passes",
       "outputEquivalence": "All unsigned APK entries byte-identical for 31.5.2 with nine recommended patches and 31.4.2 with UI settings only",
       "androidTiming": "Pending; no ADB device connected"
+    },
+    "channelActions": {
+      "date": "2026-10-14",
+      "extensionButtons": "Native extension entry-point gallery and chat-header container share one preference",
+      "actionRows": "Independent Classic Split and Vertical View preferences; row overrides preserve individual button settings",
+      "nativeModels": "Button identity and row fields resolved from the original APK; filtered copies preserve the following flag and unknown actions",
+      "layoutPolicy": "Empty customized native rows collapse their fixed height and divider; default layout remains unchanged",
+      "androidApi": 33,
+      "layoutPolicyCheck": "passed",
+      "typedBridgeCheck": "passed on the verified 31.5.2 APK with real Twitch button models",
+      "runtimeDexSha256": "d817c74fbf85f4e941e53bf4edbe8d4c3851cc7743a598a69fb0a2cd8d9a8995",
+      "installedAppCheck": "pending"
     }
   }
 }

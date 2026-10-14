@@ -10,7 +10,7 @@ internal const val UI_SETTINGS = "Ldev/twitchpatches/extension/ui/UiSettings;"
 @Suppress("unused")
 val uiSettingsPatch = bytecodePatch(
     name = "UI settings",
-    description = "Customizes player controls, channel action buttons and fullscreen system bars.",
+    description = "Customizes player controls, channel actions, extension buttons and fullscreen system bars.",
     default = true,
 ) {
     compatibleWith(TwitchTarget.compatibility)

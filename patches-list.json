@@ -376,7 +376,7 @@
     },
     {
       "name": "UI settings",
-      "description": "Customizes player controls, channel action buttons and fullscreen system bars.",
+      "description": "Customizes player controls, channel actions, extension buttons and fullscreen system bars.",
       "default": true,
       "category": null,
       "dependencies": [

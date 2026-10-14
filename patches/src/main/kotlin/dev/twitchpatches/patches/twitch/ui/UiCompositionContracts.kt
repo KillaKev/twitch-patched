@@ -17,6 +17,7 @@ internal data class UiCompositionContract(
     val classic: Method, val vertical: Method, val controls: Map<String, Method>, val support: Method,
     val subscribe: FieldReference, val gift: FieldReference, val bits: Method, val supportCallers: List<Method>,
     val classicActions: Map<String, Method>,
+    val classicRow: UiClassicActionContract,
     val actionCallers: Map<String, List<Method>> = emptyMap(),
 )
 
@@ -90,9 +91,10 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     val classicSubscribe = all.filter { it.definingClass == classicGift.definingClass &&
         it.parameterTypes == classicGift.parameterTypes + "Z" && it.hasResource("string/subscribe") }
         .uniqueHook("UI classic Subscribe renderer")
+    val classicRow = resolveClassicActionRow(all, composer)
     val actionCallers = collectUiActionCallers(all.asSequence().filter {
         it.definingClass != "Ldev/twitchpatches/extension/ui/UiComposeBridge;"
-    }.asIterable(), listOf(support, classicGift, classicSubscribe))
+    }.asIterable(), listOf(support, classicGift, classicSubscribe, classicRow.renderer))
     val supportCallers = actionCallers.getValue(support.reference)
     val bits = all.filter { it.parameterTypes.size == 7 && it.parameterTypes[4] == composer && it.hasResource("string/bits") &&
         supportCallers.any { caller -> caller.references().any { ref -> ref.toString() == it.reference } } }
@@ -108,7 +110,7 @@ internal fun BytecodePatchContext.resolveUiComposition(all: List<Method>): UiCom
     return UiCompositionContract(composer, concrete, start, end, collect, value, factory, setter,
         classic, vertical, mapOf("clip" to clip, "cast" to cast, "share" to share), support,
         model("string/subscribe"), model("string/gift_a_sub"), bits, supportCallers,
-        mapOf("subscribe" to classicSubscribe, "gift" to classicGift), actionCallers)
+        mapOf("subscribe" to classicSubscribe, "gift" to classicGift), classicRow, actionCallers)
 }
 
 private fun Method.hasResource(name: String) = implementation?.instructions?.any {

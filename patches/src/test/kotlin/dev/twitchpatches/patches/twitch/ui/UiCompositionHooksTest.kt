@@ -22,8 +22,9 @@ class UiCompositionHooksTest {
     private val start = ImmutableMethodReference("Lfixture/Concrete;", "start", listOf("I"), "V")
     private val end = ImmutableMethodReference("Lfixture/Concrete;", "end", emptyList<String>(), "V")
     private val field = ImmutableFieldReference("Lfixture/Model;", "subscribe", "Lfixture/Model;")
+    private val classicRow = UiClassicActionContract(original, field, field, start, start)
     private val contract = UiCompositionContract(composer, "Lfixture/Concrete;", start, end, start, end, start,
-        original, original, original, emptyMap(), original, field, field, original, emptyList(), emptyMap())
+        original, original, original, emptyMap(), original, field, field, original, emptyList(), emptyMap(), classicRow)
 
     @Test fun hidingAndRenderingBothCloseTheCompositionGroupAndForwardOriginalArguments() {
         val wrapper = uiWrapper(original, "share", contract, "const/4 v1, 0x0\nif-nez v1, :done")

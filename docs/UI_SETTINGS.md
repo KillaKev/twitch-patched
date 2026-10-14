@@ -7,7 +7,7 @@ without restarting Twitch.
 Options are organized by the control being changed:
 
 - Player controls: Clip, Cast and Share.
-- Channel actions: Subscribe, gifting, Bits and Leaderboard.
+- Channel actions: Subscribe, gifting, Bits, Leaderboard, extensions and the action row.
 - Display: Android status and navigation bars during landscape fullscreen playback.
 
 Controls with multiple locations have one settings page with a Hide everywhere
@@ -16,6 +16,14 @@ location switches. Classic Split settings also cover fullscreen playback.
 Subscribe and gifting distinguish the Vertical View header from channel actions
 below the video. Leaderboard is available on versions that include the button;
 casting settings apply wherever Twitch makes casting available.
+
+Channel extensions can be hidden independently. The channel action row has
+separate switches for Classic Split and Vertical View. Hiding the row also removes
+its divider and reserved space. Individual button settings are retained.
+
+Classic Split filters native action models before layout, preserving Follow and
+unrecognized actions. An empty native action row collapses when its controls are
+hidden and restores when controls become available again.
 
 Hide status bar also removes Twitch's reserved camera-cutout padding during
 landscape fullscreen playback. Keyboard insets remain active. Leaving fullscreen
@@ -27,6 +35,8 @@ Changing a system-bar option reapplies Twitch's padding listener even when Andro
 inset values stay unchanged.
 Run `scripts/test-ui-fullscreen.ps1` with a connected Android device to check
 container scope, rotation and toggle behavior without installing an APK.
+Run `scripts/test-ui-actions.ps1` to check empty-row collapse, independent
+extension visibility and restoration in Android's view system.
 
 Group switches derive their state from the location preferences and show how many
 are hidden. Existing preferences are retained. Hidden controls are removed from

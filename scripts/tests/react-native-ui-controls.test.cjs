@@ -23,6 +23,30 @@ function fixture() {
         adapt(name, original) { return adapters[name](original, React, runtime, () => modules); }};
 }
 
+test('whole-row visibility is independent across layouts and restores the original controls', () => {
+    const f = fixture(), original = () => {}, props = {buttons: [{kind: 'follow'}, {kind: 'subscribe'}]};
+    const render = f.adapt('SupportActionRow', original);
+    f.preferences.classic_support_hide_row = true;
+    assert.equal(render(props), null);
+    assert.equal(render({...props, twitchPatchUiLayout: 'vertical'}).type, original);
+    assert.equal(render({...props, twitchPatchUiLayout: 'vertical_header'}).type, original);
+    f.preferences.classic_support_hide_row = false;
+    assert.equal(render(props).props, props);
+    assert.equal(f.preferences.classic_support_hide_subscribe, undefined);
+});
+
+test('vertical action-row hiding preserves header actions and original hook execution', () => {
+    const f = fixture(), tree = f.React.createElement('View', {children: 'actions'});
+    let calls = 0;
+    const render = f.adapt('SkylineSheetActions', () => { calls++; return tree; });
+    f.preferences.vertical_support_hide_row = true;
+    assert.equal(render({}), null);
+    assert.equal(calls, 1);
+    f.preferences.vertical_support_hide_row = false;
+    assert.equal(render({}), tree);
+    assert.equal(calls, 2);
+});
+
 test('hiding controls removes their wrappers and preserves the remaining order and actions', () => {
     const f = fixture(), e = f.React.createElement;
     const press = () => {};

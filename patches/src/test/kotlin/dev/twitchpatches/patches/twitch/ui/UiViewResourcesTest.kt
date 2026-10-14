@@ -34,4 +34,22 @@ class UiViewResourcesTest {
             rewriteUiLayout(source, mapOf(id to "classic_controls_hide_cast"), mutableMapOf(), "fixture")
         }
     }
+
+    @Test fun actionRowRetainsNativeHeightAndDividerInsideTheHideableRoot() {
+        val source = """
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content">
+                <LinearLayout android:id="@id/header_container" android:layout_height="@dimen/header_height">
+                    <FrameLayout android:id="@id/extension_button_container"/>
+                </LinearLayout><View android:layout_height="1dp"/>
+            </LinearLayout>
+        """
+        val types = mutableMapOf<String, String>()
+        val child = rewriteUiLayout(source, mapOf("extension_button_container" to "hide_channel_extensions"), types, "chat_header")
+        val result = parseResourceXml(rewriteUiRoot(child, "classic_support_hide_row", "ActionRow", types, "chat_header"))
+        assertEquals("dev.twitchpatches.extension.ui.views.ActionRow", result.documentElement.tagName)
+        assertEquals("twitchpatches_ui:classic_support_hide_row", result.documentElement.getAttribute("android:tag"))
+        assertEquals(1, result.getElementsByTagName("View").length)
+        assertEquals("android.widget.LinearLayout", types["dev.twitchpatches.extension.ui.views.ActionRow"])
+        assertThrows(Exception::class.java) { rewriteUiRoot("<LinearLayout/>", "classic_support_hide_row", "ActionRow", types, "changed") }
+    }
 }

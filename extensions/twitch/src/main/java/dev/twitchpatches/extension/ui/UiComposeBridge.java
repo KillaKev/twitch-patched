@@ -4,4 +4,7 @@ public final class UiComposeBridge {
     public static Object state;
     // Replaced with Twitch's typed StateFlow calls during patching.
     public static void update() { throw new UnsupportedOperationException("UI composition bridge is not patched."); }
+    public static String classicButtonId(Object button) {
+        throw new UnsupportedOperationException("UI action identity bridge is not patched.");
+    }
 }

@@ -3,6 +3,7 @@ package dev.twitchpatches.patches.twitch.ui
 import app.morphe.patcher.patch.ResourcePatchContext
 import dev.twitchpatches.patches.twitch.shared.*
 import org.w3c.dom.Element
+import org.w3c.dom.Document
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -31,11 +32,16 @@ internal fun ResourcePatchContext.prepareUiViewResources() {
         "player_metadata_view_extended" to mapOf("extended_subscribe_button_container" to "classic_support_hide_subscribe"),
         "bottom_player_control_overlay_widget" to mapOf("subscribe_button_container" to "classic_support_hide_subscribe"),
         "player_view" to mapOf("theatre_overlay_subscribe_button_container" to "classic_support_hide_subscribe"),
+        "chat_header" to mapOf("extension_button_container" to "hide_channel_extensions"),
     )
     layouts.forEach { (name, controls) ->
         val file = get("res/layout/$name.xml")
         file.writeText(rewriteUiLayout(file.readText(), controls, uiViewTypes, name))
     }
+    val header = get("res/layout/chat_header.xml")
+    header.writeText(rewriteUiRoot(header.readText(), "classic_support_hide_row", "ActionRow", uiViewTypes, "chat_header"))
+    val extensions = get("res/layout/extension_entry_point_icons.xml")
+    extensions.writeText(rewriteUiRoot(extensions.readText(), "hide_channel_extensions", "LinearLayout", uiViewTypes, "extension_entry_point_icons"))
 }
 
 internal fun rewriteUiLayout(source: String, controls: Map<String, String>, types: MutableMap<String, String>, name: String): String {
@@ -45,21 +51,43 @@ internal fun rewriteUiLayout(source: String, controls: Map<String, String>, type
         val element = (0 until nodes.length).map { nodes.item(it) as Element }.filter {
             it.getAttribute("android:id") == "@id/$id"
         }.uniqueHook("UI $name/$id")
-        val base = when (element.tagName) {
-            "FrameLayout", "LinearLayout", "ImageView", "ImageButton" -> "android.widget.${element.tagName}"
-            else -> element.tagName
-        }
-        val replacement = VIEW_PACKAGE + base.substringAfterLast('.')
-        types[replacement] = base
-        val view = document.createElement(replacement)
-        for (index in 0 until element.attributes.length) {
-            val attribute = element.attributes.item(index)
-            view.setAttribute(attribute.nodeName, attribute.nodeValue)
-        }
-        while (element.hasChildNodes()) view.appendChild(element.firstChild)
-        view.setAttribute("android:tag", "twitchpatches_ui:$key")
-        element.parentNode.replaceChild(view, element)
+        replaceUiView(document, element, key, types)
     }
+    return serializeUiLayout(document)
+}
+
+internal fun rewriteUiRoot(source: String, key: String, wrapper: String, types: MutableMap<String, String>, name: String): String {
+    val document = parseResourceXml(source)
+    val root = document.documentElement
+    require(root.tagName == "LinearLayout") { "UI settings: $name root changed." }
+    if (wrapper == "ActionRow") {
+        val children = (0 until root.childNodes.length).map { root.childNodes.item(it) }.filterIsInstance<Element>()
+        require(children.size == 2 && children[0].getAttribute("android:id") == "@id/header_container" &&
+            children[1].tagName == "View") { "UI settings: chat action row contents changed." }
+    }
+    replaceUiView(document, root, key, types, wrapper)
+    return serializeUiLayout(document)
+}
+
+private fun replaceUiView(document: Document, element: Element, key: String, types: MutableMap<String, String>, wrapper: String? = null) {
+    val base = when (element.tagName) {
+        "FrameLayout", "LinearLayout", "ImageView", "ImageButton" -> "android.widget.${element.tagName}"
+        else -> element.tagName
+    }
+    val replacement = VIEW_PACKAGE + (wrapper ?: base.substringAfterLast('.'))
+    require(types[replacement] == null || types[replacement] == base) { "UI settings: conflicting view superclass for $replacement." }
+    types[replacement] = base
+    val view = document.createElement(replacement)
+    for (index in 0 until element.attributes.length) {
+        val attribute = element.attributes.item(index)
+        view.setAttribute(attribute.nodeName, attribute.nodeValue)
+    }
+    while (element.hasChildNodes()) view.appendChild(element.firstChild)
+    view.setAttribute("android:tag", "twitchpatches_ui:$key")
+    element.parentNode.replaceChild(view, element)
+}
+
+private fun serializeUiLayout(document: Document): String {
     val output = StringWriter()
     TransformerFactory.newInstance().newTransformer().transform(DOMSource(document), StreamResult(output))
     return output.toString()

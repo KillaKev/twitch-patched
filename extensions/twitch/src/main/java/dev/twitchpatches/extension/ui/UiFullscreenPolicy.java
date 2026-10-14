@@ -17,7 +17,6 @@ import java.util.WeakHashMap;
 
 final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks {
     private static final WeakHashMap<Activity, Session> sessions = new WeakHashMap<>();
-    private static String lastDiagnostic;
 
     static void initialize(Application app) { app.registerActivityLifecycleCallbacks(new UiFullscreenPolicy()); }
 
@@ -45,14 +44,8 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
         Session session = sessions.get(activity);
         boolean active = session != null && session.subscription != null;
         boolean fullscreen = active && session.fullscreen(activity);
-        int filtered = UiInsetTypes.filter(types, fullscreen && UiSettings.enabled("fullscreen_hide_status_bar"),
+        return UiInsetTypes.filter(types, fullscreen && UiSettings.enabled("fullscreen_hide_status_bar"),
                 fullscreen && UiSettings.enabled("fullscreen_hide_navigation_bar"));
-        if (android.util.Log.isLoggable("TwitchPatchesUI", android.util.Log.DEBUG)) {
-            String diagnostic = "active=" + active + ", fullscreen=" + fullscreen + ", mask=" + types + "/" + filtered;
-            if (!diagnostic.equals(lastDiagnostic)) android.util.Log.d("TwitchPatchesUI", "Fullscreen insets: " + diagnostic);
-            lastDiagnostic = diagnostic;
-        }
-        return filtered;
     }
 
     @Override public void onActivityResumed(Activity activity) {

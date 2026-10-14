@@ -60,7 +60,8 @@
         return function (props) {
             var prefix = props.twitchPatchUiLayout === 'vertical_header' ? 'vertical_header' :
                 (props.twitchPatchUiLayout === 'vertical' ? 'vertical' : 'classic') + '_support';
-            var hidden = useOptions(React, prefix, ['subscribe', 'gift', 'bits']);
+            var hidden = useOptions(React, prefix, ['subscribe', 'gift', 'bits', 'row']);
+            if (hidden.row) return null;
             if (!hidden.subscribe && !hidden.gift || !Array.isArray(props.buttons)) return React.createElement(original, props);
             var buttons = props.buttons.filter(function (button) {
                 return !hidden[button.kind === 'upgrade' ? 'subscribe' : button.kind];
@@ -74,7 +75,9 @@
             var Trophy = header && __TWITCH_UI_LEADERBOARD_MODULE__ !== null && require(__TWITCH_UI_LEADERBOARD_MODULE__).SkylineLeaderboardTrophy;
             return function (props) {
                 var hidden = header && useOptions(React, 'vertical_header', ['subscribe', 'gift', 'leaderboard']);
+                var hideRow = !header && runtime.ui.useEnabled(React, 'vertical_support_hide_row');
                 var result = original.apply(this, arguments);
+                if (hideRow) return null;
                 var count = 0, limit = {};
                 function visit(node, depth) {
                     if (++count > 2048 || depth > 32) throw limit;
@@ -108,8 +111,9 @@
     supportHost(__TWITCH_UI_SHEET_ACTIONS_MODULE__, 'SkylineSheetActions');
     runtime.target(__TWITCH_UI_OVERLAY_ACTIONS_MODULE__, 'OverlayActionButtons', function (original, React) {
         return function (props) {
-            var hidden = useOptions(React, 'classic_support', ['subscribe', 'gift', 'bits']);
-            return runtime.ui.filterControls(React, original.apply(this, arguments), hidden);
+            var hidden = useOptions(React, 'classic_support', ['subscribe', 'gift', 'bits', 'row']);
+            var result = original.apply(this, arguments);
+            return hidden.row ? null : runtime.ui.filterControls(React, result, hidden);
         };
     });
 })(globalThis.__twitchPatchRuntime);
