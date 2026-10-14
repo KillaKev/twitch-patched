@@ -3,7 +3,6 @@ package dev.twitchpatches.extension.settings;
 import android.app.DialogFragment;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -158,11 +157,7 @@ public final class PatchSettingsPage extends DialogFragment {
         if (dialog == null || getActivity() == null) return;
         Window window = dialog.getWindow();
         if (window == null) return;
-        window.setBackgroundDrawable(new ColorDrawable(TwitchSettingsResources.color(getActivity(), "background_body")));
-        window.setDimAmount(0);
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
-                android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        SettingsWindow.configure(window, TwitchSettingsResources.color(getActivity(), "background_body"));
     }
 
     private void syncSearch() {

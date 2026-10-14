@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string] $Source, [string] $Bundle, [string] $Serial)
+param([Parameter(Mandatory)][string] $Source, [string[]] $SupportSource = @(), [string] $Bundle, [string] $Serial)
 . "$PSScriptRoot/../common.ps1"
 if (-not $Bundle) { $Bundle = Get-BundlePath }
 $bundlePath = (Resolve-Path -LiteralPath $Bundle).Path
@@ -15,7 +15,8 @@ $run = New-RunDirectory 'android-ui-probe'
 $classes = Join-Path $run 'classes'
 New-Item -ItemType Directory -Path $classes | Out-Null
 $extensionClasses = Get-ProjectPath 'extensions/twitch/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes'
-& javac '-classpath' "$androidJar;$extensionClasses" '-d' $classes $sourcePath
+$sources = @($sourcePath) + @($SupportSource | ForEach-Object { (Resolve-Path -LiteralPath $_).Path })
+& javac '-classpath' "$androidJar;$extensionClasses" '-d' $classes @sources
 if ($LASTEXITCODE -ne 0) { throw 'Android probe compilation failed.' }
 $classFiles = @(Get-ChildItem -LiteralPath $classes -Filter '*.class' | ForEach-Object FullName)
 $probe = Join-Path $run 'probe.zip'

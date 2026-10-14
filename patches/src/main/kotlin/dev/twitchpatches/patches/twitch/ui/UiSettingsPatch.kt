@@ -19,7 +19,7 @@ val uiSettingsPatch = bytecodePatch(
         val capability = mutableClassDefBy(UI_SETTINGS).methods.filter {
             it.name == "hasLeaderboardButton" && it.parameterTypes.isEmpty() && it.returnType == "Z"
         }.uniqueHook("UI header capability")
-        injectUiHeaderCapability(capability, uiLeaderboardAvailable)
+        injectUiHeaderCapability(capability, true)
         injectUiPlayerEntry()
         injectUiNavigation()
         injectUiPolicyBridge()

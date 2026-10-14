@@ -47,6 +47,8 @@ internal fun BytecodePatchContext.injectUiComposition() {
         move-result v0
         return v0
     """, static = true))
+    injectNativeUiMenus(all, contract)
+    restoreVerticalLayoutControls(all, contract)
     for ((layout, renderer) in listOf("classic" to contract.classic, "vertical" to contract.vertical)) {
         for ((part, original) in contract.controls) {
             if (renderer.references().none { it.toString() == original.reference }) continue

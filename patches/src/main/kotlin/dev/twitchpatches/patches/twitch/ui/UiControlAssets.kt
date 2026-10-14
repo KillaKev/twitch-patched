@@ -5,17 +5,13 @@ import dev.twitchpatches.patches.twitch.shared.*
 import dev.twitchpatches.patches.twitch.shared.hermes.HermesBundle
 import dev.twitchpatches.patches.twitch.shared.hermes.MetroExports
 
-internal var uiLeaderboardAvailable = false
-    private set
-
 internal fun ResourcePatchContext.appendUiControls(bundle: HermesBundle) {
     get(RN_ASSET).appendText("\n" + renderUiControls(bundle))
 }
 
 internal fun renderUiControls(bundle: HermesBundle): String {
     val exports = MetroExports(bundle)
-    uiLeaderboardAvailable = bundle.functions.any { bundle.strings[it.name] == "SkylineLeaderboardTrophy" }
-    val leaderboard = if (uiLeaderboardAvailable) {
+    val leaderboard = if (bundle.functions.any { bundle.strings[it.name] == "SkylineLeaderboardTrophy" }) {
         exports.requireFunctionContract("SkylineLeaderboardTrophy", 1, setOf("skyline-leaderboard-trophy", "openSheetOnBoard"))
         exports.resolve("SkylineLeaderboardTrophy", setOf("useChannelLeaderboard", "hasBoards", "IconButton"), params = 1)
     } else null

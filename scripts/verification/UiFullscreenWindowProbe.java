@@ -194,7 +194,7 @@ public final class UiFullscreenWindowProbe {
         }
         @Override public int getRequestedOrientation() { return ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; }
     }
-    private static final class ProbeWindow extends Window {
+    static final class ProbeWindow extends Window {
         private final android.widget.FrameLayout decor;
         ProbeWindow(Context context) { super(context); decor = new android.widget.FrameLayout(context); }
         private UnsupportedOperationException unsupported() { return new UnsupportedOperationException("Unused window operation"); }
@@ -219,7 +219,7 @@ public final class UiFullscreenWindowProbe {
         @Override public boolean performPanelShortcut(int arg0, int arg1, android.view.KeyEvent arg2, int arg3) { throw unsupported(); }
         @Override public void restoreHierarchyState(android.os.Bundle arg0) { throw unsupported(); }
         @Override public android.os.Bundle saveHierarchyState() { throw unsupported(); }
-        @Override public void setBackgroundDrawable(android.graphics.drawable.Drawable arg0) { throw unsupported(); }
+        @Override public void setBackgroundDrawable(android.graphics.drawable.Drawable arg0) { decor.setBackground(arg0); }
         @Override public void setChildDrawable(int arg0, android.graphics.drawable.Drawable arg1) { throw unsupported(); }
         @Override public void setChildInt(int arg0, int arg1) { throw unsupported(); }
         @Override public void setContentView(android.view.View arg0) { decor.addView(arg0); }
