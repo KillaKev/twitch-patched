@@ -7,4 +7,7 @@ public final class UiComposeBridge {
     public static String classicButtonId(Object button) {
         throw new UnsupportedOperationException("UI action identity bridge is not patched.");
     }
+    public static void renderClassicHeader(Object owner, Object state) {
+        throw new UnsupportedOperationException("UI header renderer is not patched.");
+    }
 }

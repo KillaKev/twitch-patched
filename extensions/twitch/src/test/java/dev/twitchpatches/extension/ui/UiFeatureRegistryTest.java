@@ -113,14 +113,16 @@ public class UiFeatureRegistryTest {
     @Test public void catalogueGroupsControlsByPurposeAndEveryOptionIsOff() {
         UiFeatureRegistry registry = registry();
         var categories = UiOptions.create(registry, true);
-        assertEquals(10, categories.size());
+        assertEquals(9, categories.size());
         assertEquals(java.util.List.of(SettingSection.PLAYER_CONTROLS, SettingSection.CHANNEL_ACTIONS, SettingSection.DISPLAY),
                 categories.stream().map(option -> option.section()).distinct().collect(java.util.stream.Collectors.toList()));
         assertTrue(categories.stream().allMatch(option -> !option.title().isEmpty() && !option.icon().isEmpty()));
         assertTrue(categories.stream().noneMatch(option -> option.title().contains("Classic") || option.title().contains("Vertical")));
         assertEquals("ic_clip", group(categories, "ui_clip").icon());
         assertEquals("ic_subscribe", group(categories, "ui_subscribe").icon());
-        assertEquals(20, registry.options().size());
+        assertEquals(18, registry.options().size());
+        assertFalse(registry.snapshot().containsKey("classic_support_hide_row"));
+        assertFalse(registry.snapshot().containsKey("vertical_support_hide_row"));
         assertTrue(registry.options().stream().noneMatch(ToggleSetting::isEnabled));
         ToggleSetting classic = registry.options().stream().filter(option -> option.key().equals("classic_support_hide_bits")).findFirst().orElseThrow();
         classic.setEnabled(true);
@@ -181,8 +183,8 @@ public class UiFeatureRegistryTest {
     @Test public void unavailableLeaderboardIsExcludedAndLocationPreferencesRemainIndependent() {
         UiFeatureRegistry previous = registry();
         var groups = UiOptions.create(previous, false);
-        assertEquals(9, groups.size());
-        assertEquals(19, previous.options().size());
+        assertEquals(8, groups.size());
+        assertEquals(17, previous.options().size());
         assertFalse(previous.snapshot().containsKey("vertical_header_hide_leaderboard"));
         SettingGroup subscribe = group(groups, "ui_subscribe");
         assertEquals(4, subscribe.children().size());

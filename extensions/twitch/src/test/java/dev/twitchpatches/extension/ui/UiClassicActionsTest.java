@@ -25,4 +25,12 @@ public final class UiClassicActionsTest {
         assertTrue(UiClassicActions.filter(actions, id -> id, key -> true).isEmpty());
         assertSame(actions, UiClassicActions.filter(actions, id -> id, key -> false));
     }
+
+    @Test public void chatSubscribeIdentityUsesTheSamePreferenceAsOtherSubscribeButtons() {
+        var actions = List.of("subscribe_button_chat", "gift_button_chat", "bits_button_chat");
+        assertTrue(UiClassicActions.filter(actions, id -> id, key -> true).isEmpty());
+        assertSame(actions, UiClassicActions.filter(actions, id -> id, key -> false));
+        assertEquals(List.of("gift_button_chat", "bits_button_chat"),
+                UiClassicActions.filter(actions, id -> id, "classic_support_hide_subscribe"::equals));
+    }
 }

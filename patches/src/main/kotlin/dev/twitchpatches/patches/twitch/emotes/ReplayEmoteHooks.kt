@@ -6,6 +6,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import dev.twitchpatches.patches.twitch.reload.nativeReloadMethod
 import dev.twitchpatches.patches.twitch.shared.*
 
@@ -46,9 +47,6 @@ internal fun BytecodePatchContext.injectReplayEmotes() {
     """, static = true)
     owner.methods.add(bridge)
     val target = owner.methods.single { it.reference == bind.reference }
-    target.code().withIndex().filter { it.value.opcode == Opcode.RETURN_VOID }.map { it.index }.asReversed().forEach {
-        target.insertAtReturn(it, "invoke-static/range {p0 .. p1}, ${bridge.reference}")
-    }
     val touch = target.code().withIndex().filter {
         val ref = (it.value as? ReferenceInstruction)?.reference as? com.android.tools.smali.dexlib2.iface.reference.MethodReference
         ref?.name == "setOnTouchListener" && ref.parameterTypes == listOf("Landroid/view/View\$OnTouchListener;")
@@ -59,7 +57,19 @@ internal fun BytecodePatchContext.injectReplayEmotes() {
     val call = touch.value as com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
     target.replaceInstruction(touch.index, com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction35c(
         Opcode.INVOKE_STATIC, call.registerCount, call.registerC, call.registerD, call.registerE, call.registerF, call.registerG, replacement))
+    require(owner.methods.none { it.name == "twitchPatchBindReplayOriginal" }) { "Emotes: replay binder is already wrapped." }
+    owner.methods.remove(target)
+    target.name = "twitchPatchBindReplayOriginal"
+    owner.methods.add(target)
+    owner.methods.add(replayBindingWrapper(target, bridge, bind.name))
 }
+
+internal fun replayBindingWrapper(original: MethodReference, bridge: MethodReference, name: String) =
+    nativeReloadMethod(original.definingClass, name, original.parameterTypes.map { it.toString() }, "V", 2, """
+        invoke-virtual/range {p0 .. p1}, $original
+        invoke-static/range {p0 .. p1}, $bridge
+        return-void
+    """)
 
 internal fun labeledReplayField(method: com.android.tools.smali.dexlib2.iface.Method, label: String): FieldReference {
     val code = method.code()

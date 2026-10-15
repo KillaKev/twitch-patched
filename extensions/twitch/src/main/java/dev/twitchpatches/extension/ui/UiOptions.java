@@ -19,13 +19,6 @@ final class UiOptions {
         entries.add(channelButton(registry, "bits", "Bits button", "ic_bits", false));
         entries.add(registry.register("hide_channel_extensions", "Hide channel extensions",
                 "Hide extension buttons above chat.", SettingSection.CHANNEL_ACTIONS, "ic_extensions"));
-        List<ToggleSetting> rows = Arrays.asList(
-                registry.register("classic_support_hide_row", "Hide in Classic Split",
-                        "Hide the action row above chat.", SettingSection.CHANNEL_ACTIONS, "ic_subscribe"),
-                registry.register("vertical_support_hide_row", "Hide in Vertical View",
-                        "Hide channel actions below the video.", SettingSection.CHANNEL_ACTIONS, "ic_subscribe"));
-        entries.add(group(registry, "action_row", "Channel action row", SettingSection.CHANNEL_ACTIONS, "ic_subscribe",
-                "", "Hide everywhere", rows));
         if (hasLeaderboard)
             entries.add(registry.register("vertical_header_hide_leaderboard", "Hide leaderboard button",
                     "Hide the leaderboard above the video in Vertical View.", SettingSection.CHANNEL_ACTIONS, "ic_trophy"));

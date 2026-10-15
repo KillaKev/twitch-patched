@@ -60,12 +60,12 @@
         return function (props) {
             var prefix = props.twitchPatchUiLayout === 'vertical_header' ? 'vertical_header' :
                 (props.twitchPatchUiLayout === 'vertical' ? 'vertical' : 'classic') + '_support';
-            var hidden = useOptions(React, prefix, ['subscribe', 'gift', 'bits', 'row']);
-            if (hidden.row) return null;
+            var hidden = useOptions(React, prefix, ['subscribe', 'gift', 'bits']);
             if (!hidden.subscribe && !hidden.gift || !Array.isArray(props.buttons)) return React.createElement(original, props);
             var buttons = props.buttons.filter(function (button) {
                 return !hidden[button.kind === 'upgrade' ? 'subscribe' : button.kind];
             });
+            if (!buttons.length && !props.notificationSetting) return null;
             return React.createElement(original, Object.assign({}, props, {buttons: buttons}));
         };
     });
@@ -74,10 +74,8 @@
             var Row = require(__TWITCH_UI_SUPPORT_ROW_MODULE__).SupportActionRow;
             var Trophy = header && __TWITCH_UI_LEADERBOARD_MODULE__ !== null && require(__TWITCH_UI_LEADERBOARD_MODULE__).SkylineLeaderboardTrophy;
             return function (props) {
-                var hidden = header && useOptions(React, 'vertical_header', ['subscribe', 'gift', 'leaderboard']);
-                var hideRow = !header && runtime.ui.useEnabled(React, 'vertical_support_hide_row');
+                var hidden = useOptions(React, header ? 'vertical_header' : 'vertical_support', ['subscribe', 'gift', 'bits', 'leaderboard']);
                 var result = original.apply(this, arguments);
-                if (hideRow) return null;
                 var count = 0, limit = {};
                 function visit(node, depth) {
                     if (++count > 2048 || depth > 32) throw limit;
@@ -89,11 +87,11 @@
                     if (header && hidden.leaderboard && node.type === Trophy) return null;
                     if (node.type === Row) {
                         var buttons = node.props.buttons;
-                        if (header && Array.isArray(buttons) && (hidden.gift || hidden.subscribe || hidden.leaderboard)) {
+                        if (Array.isArray(buttons) && (hidden.gift || hidden.subscribe || hidden.bits || hidden.leaderboard)) {
                             buttons = buttons.filter(function (button) {
                                 return !hidden[button.kind === 'upgrade' ? 'subscribe' : button.kind];
                             });
-                            if (!buttons.length) return null;
+                            if (!buttons.length && !node.props.notificationSetting) return null;
                         }
                         return React.cloneElement(node, {twitchPatchUiLayout: header ? 'vertical_header' : 'vertical', buttons: buttons});
                     }
@@ -111,9 +109,9 @@
     supportHost(__TWITCH_UI_SHEET_ACTIONS_MODULE__, 'SkylineSheetActions');
     runtime.target(__TWITCH_UI_OVERLAY_ACTIONS_MODULE__, 'OverlayActionButtons', function (original, React) {
         return function (props) {
-            var hidden = useOptions(React, 'classic_support', ['subscribe', 'gift', 'bits', 'row']);
+            var hidden = useOptions(React, 'classic_support', ['subscribe', 'gift', 'bits']);
             var result = original.apply(this, arguments);
-            return hidden.row ? null : runtime.ui.filterControls(React, result, hidden);
+            return runtime.ui.filterControls(React, result, hidden);
         };
     });
 })(globalThis.__twitchPatchRuntime);

@@ -24,7 +24,7 @@ public final class UiClassicActions {
 
     private static String preference(String id) {
         if ("bits_button_chat".equals(id)) return "classic_support_hide_bits";
-        if ("subscribe_button".equals(id)) return "classic_support_hide_subscribe";
+        if ("subscribe_button".equals(id) || "subscribe_button_chat".equals(id)) return "classic_support_hide_subscribe";
         if ("gift_button_chat".equals(id)) return "classic_support_hide_gift";
         return null;
     }

@@ -1,7 +1,7 @@
 package dev.twitchpatches.extension.settings;
 
 public enum SettingSection {
-    CHANNEL_POINTS("Channel points", "ic_channel_points"),
+    CHANNEL_POINTS("Channel points", "channel_points"),
     CHAT("Chat", "ic_emotes"),
     PLAYBACK("Playback", "ic_play_arrow"),
     INTERFACE("Interface", "ic_settings"),

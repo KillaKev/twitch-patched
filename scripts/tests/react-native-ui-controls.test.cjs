@@ -23,11 +23,11 @@ function fixture() {
         adapt(name, original) { return adapters[name](original, React, runtime, () => modules); }};
 }
 
-test('whole-row visibility is independent across layouts and restores the original controls', () => {
+test('retired whole-row preferences cannot hide remaining controls', () => {
     const f = fixture(), original = () => {}, props = {buttons: [{kind: 'follow'}, {kind: 'subscribe'}]};
     const render = f.adapt('SupportActionRow', original);
     f.preferences.classic_support_hide_row = true;
-    assert.equal(render(props), null);
+    assert.equal(render(props).props, props);
     assert.equal(render({...props, twitchPatchUiLayout: 'vertical'}).type, original);
     assert.equal(render({...props, twitchPatchUiLayout: 'vertical_header'}).type, original);
     f.preferences.classic_support_hide_row = false;
@@ -35,16 +35,21 @@ test('whole-row visibility is independent across layouts and restores the origin
     assert.equal(f.preferences.classic_support_hide_subscribe, undefined);
 });
 
-test('vertical action-row hiding preserves header actions and original hook execution', () => {
-    const f = fixture(), tree = f.React.createElement('View', {children: 'actions'});
+test('vertical action rows collapse and restore with their visible buttons', () => {
+    const f = fixture(), Row = () => {};
+    f.modules.SupportActionRow = Row;
+    const tree = f.React.createElement('View', {children: f.React.createElement(Row, {buttons: [{kind: 'subscribe'}, {kind: 'gift'}]})});
     let calls = 0;
     const render = f.adapt('SkylineSheetActions', () => { calls++; return tree; });
-    f.preferences.vertical_support_hide_row = true;
+    f.preferences.vertical_support_hide_subscribe = true;
+    f.preferences.vertical_support_hide_gift = true;
     assert.equal(render({}), null);
     assert.equal(calls, 1);
-    f.preferences.vertical_support_hide_row = false;
-    assert.equal(render({}), tree);
+    f.preferences.vertical_support_hide_gift = false;
+    assert.deepEqual(Array.from(render({}).props.children.props.buttons, button => button.kind), ['gift']);
     assert.equal(calls, 2);
+    f.preferences.vertical_support_hide_subscribe = false;
+    assert.equal(render({}).props.children.props.buttons, tree.props.children.props.buttons);
 });
 
 test('hiding controls removes their wrappers and preserves the remaining order and actions', () => {

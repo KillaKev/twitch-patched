@@ -98,20 +98,16 @@ internal fun BytecodePatchContext.injectUiComposition() {
         replaceUiCalls(contract.actionCallers.getValue(original.reference), original.reference, action)
     }
     injectClassicActionState(owner, contract.classicRow)
-    val model = contract.classicRow.renderer.parameterTypes[0]
     val row = uiWrapper(contract.classicRow.renderer, "classicActionRow", contract, """
-        const-string v1, "classic_support_hide_row"
-        invoke-static {v1, v0}, $BRIDGE->hidden(Ljava/lang/String;${contract.composer})Z
-        move-result v1
-        if-nez v1, :done
-        invoke-static/range {p0 .. p0}, $BRIDGE->filteredClassicModel($model)$model
+        invoke-static/range {p0 .. p0}, $BRIDGE->filteredClassicModel(${contract.classicRow.renderer.parameterTypes[0]})${contract.classicRow.renderer.parameterTypes[0]}
         move-result-object p0
-        invoke-static/range {p0 .. p0}, $BRIDGE->classicActionsEmpty($model)Z
+        invoke-static/range {p0 .. p0}, $BRIDGE->classicActionsEmpty(${contract.classicRow.renderer.parameterTypes[0]})Z
         move-result v1
         if-nez v1, :done
     """)
     owner.methods.add(row)
-    replaceUiCalls(contract.actionCallers.getValue(contract.classicRow.renderer.reference), contract.classicRow.renderer.reference, row)
+    replaceNativeUiCalls(contract.actionCallers.getValue(contract.classicRow.renderer.reference), contract.classicRow.renderer.reference, row)
+    injectClassicHeader(all, owner, contract.classicRow)
 }
 
 internal fun uiWrapper(original: Method, name: String, contract: UiCompositionContract, condition: String): app.morphe.patcher.util.proxy.mutableTypes.MutableMethod {

@@ -23,6 +23,7 @@ public final class UiSettings implements SettingGroup {
             if (!preferences.contains(key) && preferences.getBoolean("vertical_support_hide_" + part, false))
                 preferences.edit().putBoolean(key, true).apply();
         }
+        migrateActionRows(preferences);
         features = new UiFeatureRegistry(new UiFeatureRegistry.Preferences() {
             @Override public boolean read(String key) { return preferences.getBoolean(key, false); }
             @Override public void write(String key, boolean enabled) {
@@ -31,6 +32,22 @@ public final class UiSettings implements SettingGroup {
         });
         categories = UiOptions.create(features, hasLeaderboardButton());
         features.observe(() -> { ReactNativeRuntime.refresh(); UiComposeBridge.update(); });
+    }
+
+    private static void migrateActionRows(SharedPreferences preferences) {
+        SharedPreferences.Editor editor = null;
+        for (String layout : new String[] {"classic", "vertical"}) {
+            String key = layout + "_support_hide_row";
+            if (!preferences.contains(key)) continue;
+            if (editor == null) editor = preferences.edit();
+            if (preferences.getBoolean(key, false)) {
+                for (String part : new String[] {"subscribe", "gift", "bits"})
+                    editor.putBoolean(layout + "_support_hide_" + part, true);
+                if (layout.equals("classic")) editor.putBoolean("hide_channel_extensions", true);
+            }
+            editor.remove(key);
+        }
+        if (editor != null) editor.apply();
     }
 
     public static synchronized void initialize(Application application) {

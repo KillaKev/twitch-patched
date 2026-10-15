@@ -527,16 +527,16 @@
     ],
     "scope": "Animation frames and lifecycle verified with compiled runtime code on Android. V2 provider parsing, image routing and previews verified with adapter tests. Live chat acceptance remains pending.",
     "replayAndOffline": {
-      "date": "2026-10-14",
+      "date": "2026-10-15",
       "versions": [
         "31.5.2",
         "31.4.2"
       ],
-      "bundleSha256": "155c6e9dd5f706ad82f046f1d06ef43d5c55457dd8e629bde347a6f0deea8a60",
+      "bundleSha256": "59d1e1bec4b9b519509cbc88beba016ed792a2af4612bace4529c94cab3d099f",
       "nativeReplay": "Uses the original comment channel ID and existing provider catalog, image loader and previews",
       "nonChannelChat": "Global-only catalog; no unrelated channel requests",
       "touchRouting": "External emote taps open previews; native touch handling retained for other input",
-      "javaKotlinTests": 237,
+      "javaKotlinTests": 240,
       "javaScriptTests": 39,
       "standaloneVerifierTests": "passed",
       "fullDexRebuild": "passed",
@@ -544,7 +544,10 @@
       "introducedHierarchyFindings": 0,
       "androidApi": 33,
       "androidTouchRegression": "passed",
-      "installedAppAcceptance": "pending"
+      "installedAppAcceptance": "31.5.2 xQc past broadcast: chat replay populated and external emotes rendered; 31.4.2 visual acceptance pending",
+      "binding": "Native binder retains its original register frame; a separate wrapper binds external emotes after native rendering",
+      "androidBindingVerification": "Patched replay classes initialized successfully with ART on Android 13 for both supported versions",
+      "androidRuntimeErrors": "No new runtime crash after the corrected update"
     }
   },
   "emoteProviderSettings": {
@@ -704,8 +707,8 @@
     "scope": "Picker checks on one Android device. Load times depend on provider connectivity; large-catalog scrolling remains a normal-use acceptance check."
   },
   "uiSettings": {
-    "date": "2026-10-14",
-    "javaKotlinTests": 237,
+    "date": "2026-10-15",
+    "javaKotlinTests": 240,
     "javaScriptTests": 39,
     "entryPoints": [
       "Patch settings",
@@ -732,9 +735,7 @@
       "vertical_header_hide_subscribe",
       "vertical_header_hide_gift",
       "vertical_header_hide_leaderboard",
-      "hide_channel_extensions",
-      "classic_support_hide_row",
-      "vertical_support_hide_row"
+      "hide_channel_extensions"
     ],
     "evaluations": [
       {
@@ -752,52 +753,50 @@
           "UI settings"
         ],
         "originalMergedSha256": "a37ae3c60e8c3388cd274770b7b2871fd34b0acda3a7d741a200d07ed1c60a5f",
-        "bundleSha256": "155c6e9dd5f706ad82f046f1d06ef43d5c55457dd8e629bde347a6f0deea8a60",
-        "apkSha256": "254068564a58a84578c4fdca937d54c0c0abe9921ea9a71f3bbbd30018a8ff2d",
+        "bundleSha256": "59d1e1bec4b9b519509cbc88beba016ed792a2af4612bace4529c94cab3d099f",
+        "apkSha256": "6f191ea5fa0caf5ca4e2d2029ca1cad1f7aeab8b5380832fc1f20ca3c682dca6",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Android 13 replay touch and settings window policy regressions passed; installed-app visual acceptance pending",
+        "deviceVerification": "Android 13 action-row live-toggle acceptance passed",
         "heapMb": 1024,
-        "date": "2026-10-14"
+        "date": "2026-10-15"
       },
       {
         "versionName": "31.4.2",
         "selection": "External emotes and UI settings",
         "patches": [
-          "BTTV, FFZ and 7TV emotes",
-          "UI settings"
+          "UI settings",
+          "BTTV, FFZ and 7TV emotes"
         ],
         "originalMergedSha256": "201f1539aa44cd79adc0655f7fc9a9e4edf350df611abad4e20b81be5c6099ad",
-        "bundleSha256": "155c6e9dd5f706ad82f046f1d06ef43d5c55457dd8e629bde347a6f0deea8a60",
-        "apkSha256": "23f9a7dba4f2de45e297d8f9872e96e71b6dd9b849c1f3f7aea2513a548b1f5a",
+        "bundleSha256": "59d1e1bec4b9b519509cbc88beba016ed792a2af4612bace4529c94cab3d099f",
+        "apkSha256": "a50794cf78a90ff855b1f3ddd699da4b0eceeed2b3eb4359faf496ca79881243",
         "fullDexRebuild": "passed",
         "sdkPerDexAndApkChecks": "passed",
-        "runtimeWindowPolicy": "Fullscreen container inset filter with immediate native padding refresh",
         "originalHierarchyFindings": 93,
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
-        "deviceVerification": "Android 13 replay touch and settings window policy regressions passed; installed-app visual acceptance pending",
+        "deviceVerification": "Installed-app acceptance pending",
         "heapMb": 1024,
-        "date": "2026-10-14"
+        "date": "2026-10-15"
       }
     ],
     "androidVerification": {
       "androidApi": 33,
       "xmlResourceTransformation": "passed using Android DOM and the installed Manager runtime",
-      "policyClassLinkage": "Previous core view constructors verified; ActionRow and extension FrameLayout constructed and exercised on Android 13",
+      "policyClassLinkage": "Native extension policy constructors exercised on Android 13; header and replay bindings verified with ART",
       "fullscreenFlagRestoration": "passed in a standalone ART process",
-      "managerApkBuild": "Current UI update rebuilt and audited with Morphe Desktop at a 1024 MB heap; Manager build pending",
+      "managerApkBuild": "Nine recommended patches rebuilt with Morphe Desktop at a 1024 MB heap; Android Manager build pending",
       "installation": "2026-10-15: verified Desktop output signed with the existing Manager certificate and installed through ADB; app data and signed-in session retained",
-      "runtimeUiChecks": "Android 13 replay touch and settings window regressions passed; installed app startup and Patch settings passed; VOD and vertical-player visual acceptance pending",
+      "runtimeUiChecks": "Android 13 native header collapse, live Gift restoration, detached preference changes, stable visibility sampling and settings icon passed; both Subscribe identities passed real-model checks; broader vertical-player acceptance remains pending",
       "managerRerun": "Pending for the current UI update",
       "cutoutGeometry": "Existing fullscreen off-to-on regression passed again on Android 13"
     },
     "regressionChecks": [
-      "All 20 customization options default to off on both supported versions",
+      "All 18 customization options default to off on both supported versions",
       "Group switches derive mixed state and notify once after updating all members",
       "Classic Split and Vertical View use independent preferences",
       "Nested Back navigation restores the previous group and scroll position",
@@ -830,8 +829,6 @@
       "Inset filtering resolves themed activity contexts, targets only the fullscreen container and preserves other containers, unidentified views, portrait and paused activities",
       "Native padding refresh handles off-to-on transitions with unchanged insets, preserves keyboard padding and ignores queued layouts after pause",
       "Classic action filtering retains original models when unchanged and preserves Follow, unknown actions and the original following state",
-      "Action row overrides preserve individual button preferences and remain independent across Classic Split and Vertical View",
-      "Android view measurement collapses the fixed-height row and divider only when its customized contents are empty; visible titles and restored actions reopen it",
       "Abstract native button identity contracts resolve without requiring an implementation",
       "Replay channel identity is derived from the original comment model and cannot fall through to the video ID",
       "Replay emote taps include image edges; ordinary touches retain the native listener and cancelled gestures release the handler",
@@ -839,9 +836,15 @@
       "Native vertical headers observe Subscribe, Gift and Leaderboard preferences without changing unrelated actions",
       "Native Options menus use the original row component and retain existing video and viewing options",
       "Missing vertical layout controls reuse the original view selector and Classic Split callback with a verified live composer register",
-      "Settings windows fill the display cutout while preserving keyboard resize behavior"
+      "Settings windows fill the display cutout while preserving keyboard resize behavior",
+      "Retired row preferences migrate once to individual actions; subsequent user changes remain intact",
+      "Both native Subscribe identities use the same preference; filtered models preserve Follow and unknown actions",
+      "Standalone extension overflow and leaderboard extension containers share the extension visibility preference",
+      "Native chat headers derive visibility from their original content state without custom measurement or composition recreation",
+      "Weak native header bindings retain original states through temporary detachment and refresh after preference changes",
+      "Android 13 installed-app test samples stable hidden and visible states, repeats hide/show cycles and restores actions after detached preference changes"
     ],
-    "scope": "Full DEX rebuilds and original-aware SDK checks passed for both supported versions. Android 13 replay touch and settings window regressions passed without installation; Manager build and installed-app visual acceptance remain pending.",
+    "scope": "Full DEX rebuilds and original-aware SDK checks passed for both supported versions. Android 13 installed-app action-row checks passed on 31.5.2. Final Android Manager build remains pending.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -866,7 +869,7 @@
       "nativeResources": "Search theme and all row icons found in both supported original APKs",
       "preferenceMigration": "Existing keys retained; new header Subscribe and Gift preferences inherit the previous action preferences when absent",
       "desktopEvaluations": "Full APK rebuild and original-aware SDK checks passed at a 1024 MB patcher heap",
-      "deviceAcceptance": "Pending: layout, light/dark themes, keyboard, touch and Back behavior; no device connected",
+      "deviceAcceptance": "Native settings navigation, retired row-control removal and standard channel-points icon passed on Android 13; broader theme and layout checks remain pending",
       "controls": [
         "Clip button",
         "Cast button",
@@ -875,7 +878,8 @@
         "Gift buttons",
         "Bits button",
         "Hide leaderboard button",
-        "System bars"
+        "System bars",
+        "Hide channel extensions"
       ],
       "grouping": "One page per control; Hide everywhere updates its location preferences atomically. Location switches remain independent; system bars have a Hide both bars switch."
     },
@@ -929,16 +933,16 @@
       "androidTiming": "Pending; no ADB device connected"
     },
     "channelActions": {
-      "date": "2026-10-14",
-      "extensionButtons": "Native extension entry-point gallery and chat-header container share one preference",
-      "actionRows": "Independent Classic Split and Vertical View preferences; row overrides preserve individual button settings",
-      "nativeModels": "Button identity and row fields resolved from the original APK; filtered copies preserve the following flag and unknown actions",
-      "layoutPolicy": "Empty customized native rows collapse their fixed height and divider; default layout remains unchanged",
+      "date": "2026-10-15",
+      "extensionButtons": "Gallery, single-icon overflow, chat header and leaderboard extension containers share one preference",
+      "actionRows": "Empty rows and dividers collapse automatically; remaining actions retain their native spacing",
+      "nativeModels": "Both Subscribe identities, gifting and Bits filter before layout; Follow and unknown actions remain intact",
+      "preferenceMigration": "Retired whole-row preferences migrate once to individual action preferences",
+      "liveRefresh": "Twitch header binding reapplies its original state; visibility follows native content availability without custom measurement or composition recreation",
       "androidApi": 33,
       "layoutPolicyCheck": "passed",
-      "typedBridgeCheck": "passed on the verified 31.5.2 APK with real Twitch button models",
-      "runtimeDexSha256": "d817c74fbf85f4e941e53bf4edbe8d4c3851cc7743a598a69fb0a2cd8d9a8995",
-      "installedAppCheck": "pending"
+      "typedBridgeCheck": "passed with real Twitch button models",
+      "installedAppCheck": "passed; repeated hide/show cycles in the same app process"
     },
     "standaloneVerifierTests": "passed",
     "nativeVerticalSurfaces": {
@@ -962,12 +966,13 @@
       "androidApi": 33,
       "build": "Nine recommended patches; full DEX rebuild and original-aware SDK audit",
       "signing": "Existing Manager certificate; APK contents unchanged after signing",
-      "apkSha256": "2c55dad4dc364a4da108d8f77910439bee0fb7ba354ccac2c08651b1bf8dbe33",
+      "apkSha256": "ba915f4d72012579bb939ea57adda3b2e7de0b89ec735d8b10c0650928c49ded",
       "installation": "passed; ADB update retained original installation identity and signed-in session",
       "startup": "passed",
       "patchSettings": "passed",
-      "visualFeatureAcceptance": "pending",
-      "managerPatching": "pending; final release verification"
+      "visualFeatureAcceptance": "Action-row collapse, live action restoration, detached preference changes, retired row settings removal and standard channel-points icon passed; extension policy and resource checks passed, current channel has no extension catalog",
+      "managerPatching": "pending; final release verification",
+      "idleStability": "Same process remained active with no new Android runtime crash; hidden Gift remained absent without test input"
     }
   }
 }

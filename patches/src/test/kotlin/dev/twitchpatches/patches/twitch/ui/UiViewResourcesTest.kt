@@ -35,7 +35,7 @@ class UiViewResourcesTest {
         }
     }
 
-    @Test fun actionRowRetainsNativeHeightAndDividerInsideTheHideableRoot() {
+    @Test fun extensionHidingKeepsTheOriginalHeaderAndDivider() {
         val source = """
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content">
                 <LinearLayout android:id="@id/header_container" android:layout_height="@dimen/header_height">
@@ -45,11 +45,18 @@ class UiViewResourcesTest {
         """
         val types = mutableMapOf<String, String>()
         val child = rewriteUiLayout(source, mapOf("extension_button_container" to "hide_channel_extensions"), types, "chat_header")
-        val result = parseResourceXml(rewriteUiRoot(child, "classic_support_hide_row", "ActionRow", types, "chat_header"))
-        assertEquals("dev.twitchpatches.extension.ui.views.ActionRow", result.documentElement.tagName)
-        assertEquals("twitchpatches_ui:classic_support_hide_row", result.documentElement.getAttribute("android:tag"))
+        val result = parseResourceXml(child)
+        assertEquals("LinearLayout", result.documentElement.tagName)
+        assertFalse(result.documentElement.hasAttribute("android:tag"))
         assertEquals(1, result.getElementsByTagName("View").length)
-        assertEquals("android.widget.LinearLayout", types["dev.twitchpatches.extension.ui.views.ActionRow"])
-        assertThrows(Exception::class.java) { rewriteUiRoot("<LinearLayout/>", "classic_support_hide_row", "ActionRow", types, "changed") }
+        assertEquals("android.widget.FrameLayout", types.values.single())
+    }
+
+    @Test fun standaloneExtensionIconKeepsItsOverflowLabelInsideTheHiddenRoot() {
+        val source = "<FrameLayout xmlns:android='http://schemas.android.com/apk/res/android'><TextView android:id='@id/more_extension_text'/></FrameLayout>"
+        val result = parseResourceXml(rewriteUiRoot(source, "hide_channel_extensions", "FrameLayout", mutableMapOf(), "icon"))
+        assertEquals("dev.twitchpatches.extension.ui.views.FrameLayout", result.documentElement.tagName)
+        assertEquals("twitchpatches_ui:hide_channel_extensions", result.documentElement.getAttribute("android:tag"))
+        assertEquals(1, result.getElementsByTagName("TextView").length)
     }
 }

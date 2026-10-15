@@ -33,15 +33,16 @@ internal fun ResourcePatchContext.prepareUiViewResources() {
         "bottom_player_control_overlay_widget" to mapOf("subscribe_button_container" to "classic_support_hide_subscribe"),
         "player_view" to mapOf("theatre_overlay_subscribe_button_container" to "classic_support_hide_subscribe"),
         "chat_header" to mapOf("extension_button_container" to "hide_channel_extensions"),
+        "chat_view_delegate" to mapOf("leaderboards_extensions_container" to "hide_channel_extensions"),
     )
     layouts.forEach { (name, controls) ->
         val file = get("res/layout/$name.xml")
         file.writeText(rewriteUiLayout(file.readText(), controls, uiViewTypes, name))
     }
-    val header = get("res/layout/chat_header.xml")
-    header.writeText(rewriteUiRoot(header.readText(), "classic_support_hide_row", "ActionRow", uiViewTypes, "chat_header"))
     val extensions = get("res/layout/extension_entry_point_icons.xml")
     extensions.writeText(rewriteUiRoot(extensions.readText(), "hide_channel_extensions", "LinearLayout", uiViewTypes, "extension_entry_point_icons"))
+    val icon = get("res/layout/extension_entry_point_single_icon.xml")
+    icon.writeText(rewriteUiRoot(icon.readText(), "hide_channel_extensions", "FrameLayout", uiViewTypes, "extension_entry_point_single_icon"))
 }
 
 internal fun rewriteUiLayout(source: String, controls: Map<String, String>, types: MutableMap<String, String>, name: String): String {
@@ -59,12 +60,7 @@ internal fun rewriteUiLayout(source: String, controls: Map<String, String>, type
 internal fun rewriteUiRoot(source: String, key: String, wrapper: String, types: MutableMap<String, String>, name: String): String {
     val document = parseResourceXml(source)
     val root = document.documentElement
-    require(root.tagName == "LinearLayout") { "UI settings: $name root changed." }
-    if (wrapper == "ActionRow") {
-        val children = (0 until root.childNodes.length).map { root.childNodes.item(it) }.filterIsInstance<Element>()
-        require(children.size == 2 && children[0].getAttribute("android:id") == "@id/header_container" &&
-            children[1].tagName == "View") { "UI settings: chat action row contents changed." }
-    }
+    require(root.tagName == if (wrapper == "FrameLayout") "FrameLayout" else "LinearLayout") { "UI settings: $name root changed." }
     replaceUiView(document, root, key, types, wrapper)
     return serializeUiLayout(document)
 }
