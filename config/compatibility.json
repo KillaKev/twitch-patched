@@ -791,8 +791,8 @@
       "policyClassLinkage": "Previous core view constructors verified; ActionRow and extension FrameLayout constructed and exercised on Android 13",
       "fullscreenFlagRestoration": "passed in a standalone ART process",
       "managerApkBuild": "Current UI update rebuilt and audited with Morphe Desktop at a 1024 MB heap; Manager build pending",
-      "installation": "Current update not installed; standalone Android verification preserved the installed app and data",
-      "runtimeUiChecks": "Android 13 replay touch routing and settings window cutout policy passed; installed-app visual acceptance pending",
+      "installation": "2026-10-15: verified Desktop output signed with the existing Manager certificate and installed through ADB; app data and signed-in session retained",
+      "runtimeUiChecks": "Android 13 replay touch and settings window regressions passed; installed app startup and Patch settings passed; VOD and vertical-player visual acceptance pending",
       "managerRerun": "Pending for the current UI update",
       "cutoutGeometry": "Existing fullscreen off-to-on regression passed again on Android 13"
     },
@@ -954,6 +954,20 @@
       "androidApi": 33,
       "androidRegression": "passed; replay tap routing, image edges, cancellation and settings window attributes",
       "installedAppAcceptance": "pending"
+    },
+    "developmentInstallation": {
+      "date": "2026-10-15",
+      "versionName": "31.5.2",
+      "versionCode": 3105026,
+      "androidApi": 33,
+      "build": "Nine recommended patches; full DEX rebuild and original-aware SDK audit",
+      "signing": "Existing Manager certificate; APK contents unchanged after signing",
+      "apkSha256": "2c55dad4dc364a4da108d8f77910439bee0fb7ba354ccac2c08651b1bf8dbe33",
+      "installation": "passed; ADB update retained original installation identity and signed-in session",
+      "startup": "passed",
+      "patchSettings": "passed",
+      "visualFeatureAcceptance": "pending",
+      "managerPatching": "pending; final release verification"
     }
   }
 }
