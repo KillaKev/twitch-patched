@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '../../patches/src/main/resources/reactnative');
 
-function fixture() {
+function fixture(skyline = false) {
     const adapters = {}, preferences = {}, modules = {};
     const runtime = {ui: {useEnabled(React, key) { return preferences[key] === true; }}, log() {},
         target(id, name, adapter) { adapters[name] = adapter; }, decorate(id, name, adapter) { adapters[name] = adapter; }};
@@ -17,6 +17,7 @@ function fixture() {
         useContext(context) { return context.current; }
     };
     const source = fs.readFileSync(path.join(root, 'ui-controls.js'), 'utf8')
+        .replace('__TWITCH_UI_SKYLINE_ROW_EXPORT__', skyline ? 'SkylineSupportActionRow' : 'SupportActionRow')
         .replace(/__TWITCH_UI_[A-Z_]+_MODULE__/g, '10');
     vm.runInNewContext(source, {globalThis: {__twitchPatchRuntime: runtime}});
     return {React, runtime, preferences, adapters, modules,
@@ -50,6 +51,26 @@ test('vertical action rows collapse and restore with their visible buttons', () 
     assert.equal(calls, 2);
     f.preferences.vertical_support_hide_subscribe = false;
     assert.equal(render({}).props.children.props.buttons, tree.props.children.props.buttons);
+});
+
+test('separate Skyline support rows retain their layout preferences and callbacks', () => {
+    const f = fixture(true), e = f.React.createElement;
+    const Row = () => {}, Generic = () => {}, onOpenGift = () => {};
+    f.modules.SkylineSupportActionRow = Row;
+    f.modules.SupportActionRow = Generic;
+    const props = {buttons: [{kind: 'subscribe'}, {kind: 'gift'}], onOpenGift};
+    const host = f.adapt('SkylineSheetActions', () => e('View', {children: e(Row, props)}));
+    const render = f.adapt('SkylineSupportActionRow', Row);
+    f.preferences.vertical_support_hide_subscribe = true;
+    const nested = host({}).props.children;
+    assert.equal(nested.props.twitchPatchUiLayout, 'vertical');
+    assert.deepEqual(Array.from(render(nested.props).props.buttons, button => button.kind), ['gift']);
+    assert.equal(render(nested.props).props.onOpenGift, onOpenGift);
+    assert.equal(f.adapt('SupportActionRow', Generic)(props).props, props);
+    f.preferences.vertical_support_hide_gift = true;
+    assert.equal(host({}), null);
+    f.preferences.vertical_support_hide_subscribe = false;
+    assert.deepEqual(Array.from(host({}).props.children.props.buttons, button => button.kind), ['subscribe']);
 });
 
 test('hiding controls removes their wrappers and preserves the remaining order and actions', () => {

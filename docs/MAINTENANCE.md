@@ -48,7 +48,7 @@ after the development tests pass.
 records its identity and optionally decompiles or patches it. For example:
 
 ```powershell
-./scripts/evaluate-update.ps1 -InputApk '.local/inputs/twitch.apkm' -ExpectedVersion '31.5.2' -Decompile
+./scripts/evaluate-update.ps1 -InputApk '.local/inputs/twitch.apkm' -ExpectedVersion '31.6.0' -Decompile
 ```
 
 Review the candidate's hooks before updating `TwitchTarget.kt`. Evaluate native

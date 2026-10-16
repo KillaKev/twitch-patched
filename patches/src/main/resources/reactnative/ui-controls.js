@@ -56,22 +56,25 @@
         };
     });
 
-    runtime.target(__TWITCH_UI_SUPPORT_ROW_MODULE__, 'SupportActionRow', function (original, React) {
+    function supportRow(module, name) { runtime.target(module, name, function (original, React) {
         return function (props) {
             var prefix = props.twitchPatchUiLayout === 'vertical_header' ? 'vertical_header' :
                 (props.twitchPatchUiLayout === 'vertical' ? 'vertical' : 'classic') + '_support';
             var hidden = useOptions(React, prefix, ['subscribe', 'gift', 'bits']);
-            if (!hidden.subscribe && !hidden.gift || !Array.isArray(props.buttons)) return React.createElement(original, props);
+            if (!hidden.subscribe && !hidden.gift && !hidden.bits || !Array.isArray(props.buttons)) return React.createElement(original, props);
             var buttons = props.buttons.filter(function (button) {
                 return !hidden[button.kind === 'upgrade' ? 'subscribe' : button.kind];
             });
             if (!buttons.length && !props.notificationSetting) return null;
             return React.createElement(original, Object.assign({}, props, {buttons: buttons}));
         };
-    });
+    }); }
+    supportRow(__TWITCH_UI_SUPPORT_ROW_MODULE__, 'SupportActionRow');
+    var skylineRowName = '__TWITCH_UI_SKYLINE_ROW_EXPORT__';
+    if (skylineRowName !== 'SupportActionRow') supportRow(__TWITCH_UI_SKYLINE_ROW_MODULE__, skylineRowName);
     function supportHost(module, name, header) {
         runtime.target(module, name, function (original, React, policy, require) {
-            var Row = require(__TWITCH_UI_SUPPORT_ROW_MODULE__).SupportActionRow;
+            var Row = require(__TWITCH_UI_SKYLINE_ROW_MODULE__)[skylineRowName];
             var Trophy = header && __TWITCH_UI_LEADERBOARD_MODULE__ !== null && require(__TWITCH_UI_LEADERBOARD_MODULE__).SkylineLeaderboardTrophy;
             return function (props) {
                 var hidden = useOptions(React, header ? 'vertical_header' : 'vertical_support', ['subscribe', 'gift', 'bits', 'leaderboard']);

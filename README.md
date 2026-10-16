@@ -32,10 +32,10 @@ Supported Twitch versions:
 
 | Version | Version code |
 | --- | --- |
+| 31.6.0 | 3106006 |
 | 31.5.2 | 3105026 |
-| 31.4.2 | 3104026 |
 
-Twitch 31.5.2 is the primary target; 31.4.2 remains supported by the same hooks. Verification uses ARM64 on Android 13. See [compatibility data](config/compatibility.json) for build results, device checks and remaining validation.
+Twitch 31.6.0 is the primary target; 31.5.2 remains supported by the same hooks. Verification uses ARM64 on Android 13. See [compatibility data](config/compatibility.json) for build results, device checks and remaining validation.
 
 Ad blocking is under evaluation. Google Play billing is unavailable in the re-signed app.
 
