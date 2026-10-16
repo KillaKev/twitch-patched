@@ -1,7 +1,5 @@
-[![Latest Release](https://img.shields.io/github/v/release/ryykitty/twitch-patched?style=for-the-badge&logo=github&color=green)](https://github.com/ryykitty/twitch-patched/releases/latest) 
+[![Latest Release](https://img.shields.io/github/v/release/ryykitty/twitch-patched?style=for-the-badge&logo=github&color=green)](https://github.com/ryykitty/twitch-patched/releases/latest)
 [![Dev Release](https://img.shields.io/github/v/release/ryykitty/twitch-patched?include_prereleases&filter=*dev*&sort=date&label=Dev%20Release&color=orange&style=for-the-badge&logo=github)](https://github.com/ryykitty/twitch-patched/releases)
-
-
 
 # Twitch patches
 
@@ -11,7 +9,7 @@ Independent patches for the official Twitch Android app, compatible with [Morphe
 
 Select each feature independently when patching. Included features appear under Twitch's **Settings > Patch settings**; omitted patches do not add settings.
 
-Patch settings include search across categories and individual options. UI controls are grouped by function and player layout, with group and individual switches.
+Patch settings include search, emote provider controls and UI customization. Group switches and individual controls let you choose which elements to hide.
 
 | Patch | Behavior |
 | --- | --- |

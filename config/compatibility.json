@@ -23,7 +23,9 @@
         "morpheDesktop": "1.18.0",
         "jadx": "1.5.6",
         "java": 21,
-        "androidBuildTools": "36.0.0"
+        "androidBuildTools": "36.0.0",
+        "morpheManager": "1.35.0",
+        "androidPatcher": "1.15.1"
       },
       "appliedPatches": [
         "Auto-claim bonus channel points",
@@ -45,13 +47,14 @@
         "originalHierarchyFindings": 116,
         "introducedHierarchyFindings": 0,
         "typeContracts": 86,
-        "deviceArtVerification": "Android 13 replay binding and native token observer ART checks passed; installed-app window checks passed",
-        "note": "Original-aware verification retains upstream hierarchy findings. Final Android Manager patching and extended feature acceptance remain pending."
+        "deviceArtVerification": "Android 13 replay binding, fullscreen viewport and installed-player live-toggle checks passed",
+        "note": "Morphe Manager patching, same-key installation and original-aware SDK verification passed. Extended ad, theme and notification acceptance remains a normal-use check."
       },
       "evaluatedArtifact": {
         "date": "2026-10-16",
-        "bundleSha256": "b2936fbc4c79dd7b074c2f54da7a082d88d61c5386c84804d78ee445225ce3e7",
-        "apkSha256": "7b8a588008d590f60a09725517206fca52819c716bf4f95265ffba6eebee2cf6",
+        "build": "Morphe Manager",
+        "bundleSha256": "2d1efc37154c0cae83c6c835925741f0ef87347ab914c9791fe4f1f95427cb3b",
+        "apkSha256": "66bdb498d4c09b8058daa670a89c93e77664f559a1e43acf4cd6f9906be4474b",
         "deviceInstall": "passed; package, signing key, UID and first installation time retained"
       }
     },
@@ -97,7 +100,7 @@
         "introducedHierarchyFindings": 0,
         "typeContracts": 69,
         "deviceArtVerification": "Native token observer ART regression passed on Android 13; previous app acceptance retained; this exact build was not installed",
-        "note": "Original-aware verification retains upstream hierarchy findings. Final Android Manager patching and extended feature acceptance remain pending."
+        "note": "Recorded Desktop rebuild and SDK audit passed. Shared fullscreen runtime passed Android 13 regression checks; this exact APK was not installed."
       },
       "evaluatedArtifact": {
         "date": "2026-10-16",
@@ -527,10 +530,10 @@
       "androidApi": 33,
       "policyClassLinkage": "31.6.0 replay binding and native token observer verified with ART; retained 31.5.2 token observer also passed",
       "fullscreenFlagRestoration": "Standalone rotation, lifecycle, independent bars and keyboard-resize regression passed; installed-app repeated toggle cycles passed",
-      "managerApkBuild": "Nine recommended patches rebuilt with Morphe Desktop at a 1024 MB heap on both versions; final Android Manager build pending",
-      "installation": "2026-10-16: Twitch 31.6.0 signed with the existing Manager certificate and installed through ADB; app data and installation identity retained",
-      "runtimeUiChecks": "Same open landscape settings window restored cutout mode and navigation flags through repeated cycles. User confirmed Reload and external emotes work.",
-      "managerRerun": "Pending before publication",
+      "managerApkBuild": "Morphe Manager 1.35.0 and patcher 1.15.1 applied nine recommended patches on Twitch 31.6.0 with a 1024 MB heap and stripped libraries",
+      "installation": "2026-10-16: Manager-built Twitch 31.6.0 installed with the existing signing key; app UID, first installation time and data retained",
+      "runtimeUiChecks": "Repeated live player off/on cycles passed with settings open and after dismissal. Unlocked landscape restored zero cutout padding on re-enable without restarting.",
+      "managerRerun": "passed; final APK SDK audit and replay ART verification passed",
       "cutoutGeometry": "Installed landscape settings window returned from x=0 to the native x=65 cutout inset when the status-bar override was disabled"
     },
     "regressionChecks": [
@@ -584,9 +587,10 @@
       "Settings lifecycle cleanup restores original flags and cutout mode, removes listeners and ignores queued callbacks after stop",
       "Native theme restoration derives the AndroidX activity signature from the original lifecycle method",
       "Native token callbacks derive their names from observer parameter types and implement the original interface",
-      "Distinct Vertical View support rows preserve independent action preferences and restore original callbacks"
+      "Distinct Vertical View support rows preserve independent action preferences and restore original callbacks",
+      "Unlocked landscape fullscreen follows live system-bar preferences; empty Home, hidden, detached and reduced player viewports retain normal insets"
     ],
-    "scope": "Both supported versions passed full DEX rebuilding and original-aware SDK verification with the same bundle. Android 13 installation and live settings-window restoration passed on 31.6.0. Final Android Manager patching and extended feature acceptance remain pending.",
+    "scope": "Recorded Desktop rebuilds and original-aware SDK audits passed for both supported versions. The final 31.6.0 Manager build, same-key update and live fullscreen toggles passed on Android 13. Extended feature acceptance remains a normal-use check.",
     "patchingMemory": {
       "date": "2026-10-10",
       "heapMb": 1024,
@@ -647,7 +651,7 @@
       "scope": "Landscape fullscreen with Hide status bar enabled; portrait and disabled-state inset handling unchanged",
       "lifecycle": "Filtering is limited to the fullscreen container of the resumed viewer activity; preference changes dispatch the current native insets, pause restores host handling and queued callbacks cannot reapply overrides after pause",
       "desktopChecks": "Full DEX rebuild and original-aware SDK checks passed at a 1024 MB patcher heap; compiled bridge present in both output APKs",
-      "deviceChecks": "Initial cutout removal confirmed on the previous Manager APK; corrected live-toggle behavior awaits phone acceptance",
+      "deviceChecks": "31.6.0 Manager APK passed repeated live enable/disable cycles, including unlocked landscape; see fullscreenLiveToggle",
       "liveToggleRegression": {
         "androidApi": 37,
         "unchangedInsetsReenable": "passed",
@@ -713,7 +717,7 @@
       "startup": "passed; live stream playback and chat opened",
       "patchSettings": "passed; installed-app landscape dialog and live preferences",
       "visualFeatureAcceptance": "User confirmed Reload and external emotes work on 31.6.0; extended theme and ad acceptance pending",
-      "managerPatching": "pending; final release verification"
+      "managerPatching": "passed; final Manager-built artifact recorded under androidManagerBuild"
     },
     "settingsWindow": {
       "date": "2026-10-16",
@@ -722,6 +726,48 @@
       "standaloneRegression": "passed; repeated toggle cycles, independent bars, original flags, rotation, lifecycle and keyboard resize",
       "installedAppRegression": "passed; repeated cycles in the same open landscape dialog",
       "geometry": "[true/true:0,0 2273x1080, false/true:65,0 2343x1080, false/false:65,0 2343x1080, true/true:0,0 2408x1080, false/true:65,0 2343x1080, false/false:65,0 2343x1080]"
+    },
+    "fullscreenLiveToggle": {
+      "date": "2026-10-16",
+      "versionName": "31.6.0",
+      "androidApi": 33,
+      "detection": "Native theatre presenter must cover the visible fullscreen container when orientation is unlocked",
+      "standalone": "passed; native padding, unlocked landscape, miniplayer, translation, visibility, attachment, portrait and empty Home container",
+      "installedApp": "passed; repeated player and open-settings off/on cycles, dismissal and unlocked-landscape re-enable in one app process",
+      "geometry": "Both enabled: padding 0,0,0,0. Both disabled: native padding 65,68,135,0. Re-enabling restores 0,0,0,0 without restarting.",
+      "retainedTarget": "31.5.2 contains both native resource identities used by the shared viewport check"
+    },
+    "androidManagerBuild": {
+      "date": "2026-10-16",
+      "versionName": "31.6.0",
+      "versionCode": 3106006,
+      "androidApi": 33,
+      "morpheManager": "1.35.0",
+      "patcher": "1.15.1",
+      "heapMb": 1024,
+      "libraries": "stripped",
+      "patchesApplied": 9,
+      "patchSelection": [
+        "Auto-claim bonus channel points",
+        "BTTV, FFZ and 7TV emotes",
+        "Block client-requested ads",
+        "Block stream ads",
+        "Hide Turbo promotions",
+        "Hide feed and display ads",
+        "Hide subscription discount banners",
+        "Reload stream",
+        "UI settings"
+      ],
+      "bundleSha256": "2d1efc37154c0cae83c6c835925741f0ef87347ab914c9791fe4f1f95427cb3b",
+      "apkSha256": "66bdb498d4c09b8058daa670a89c93e77664f559a1e43acf4cd6f9906be4474b",
+      "patchingRebuildingSigning": "passed",
+      "installation": "passed; existing signing key and app data retained",
+      "sdkPerDexAndApkChecks": "passed",
+      "originalHierarchyFindings": 116,
+      "introducedHierarchyFindings": 0,
+      "typeContracts": 86,
+      "replayArtVerification": "passed",
+      "installedFullscreenLiveToggles": "passed"
     }
   },
   "versionUpgrade": {
