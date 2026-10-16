@@ -1,3 +1,8 @@
+[![Latest Release](https://img.shields.io/github/v/release/ryykitty/twitch-patched?style=for-the-badge&logo=github&color=green)](https://github.com/ryykitty/twitch-patched/releases/latest) 
+[![Dev Release](https://img.shields.io/github/v/release/ryykitty/twitch-patched?include_prereleases&filter=*dev*&sort=date&label=Dev%20Release&color=orange&style=for-the-badge&logo=github)](https://github.com/ryykitty/twitch-patched/releases)
+
+
+
 # Twitch patches
 
 Independent patches for the official Twitch Android app, compatible with [Morphe](https://morphe.software/).
