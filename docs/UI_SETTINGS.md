@@ -5,8 +5,8 @@ chat settings. All customization options are off by default and take effect
 without restarting Twitch.
 
 Native Vertical View menus and headers use the same settings as their React Native
-counterparts. The settings window covers the landscape cutout area while retaining
-keyboard resizing. Native overlays retain the view-switch controls alongside chat
+counterparts. The settings window follows landscape system-bar preferences in both
+directions while retaining keyboard resizing. Native overlays retain the view-switch controls alongside chat
 position controls.
 
 Options are organized by the control being changed:

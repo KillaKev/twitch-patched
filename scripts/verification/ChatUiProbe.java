@@ -55,13 +55,14 @@ public final class ChatUiProbe {
         Window window = new UiFullscreenWindowProbe.ProbeWindow(context);
         SettingsWindow.configure(window, Color.BLACK);
         check(window.getAttributes().width == -1 && window.getAttributes().height == -1, "settings window fills its bounds");
-        check(window.getAttributes().layoutInDisplayCutoutMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES,
-                "settings background extends into the cutout area");
+        check(window.getAttributes().layoutInDisplayCutoutMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT,
+                "settings retain default cutout handling without customization");
         check((window.getAttributes().softInputMode & WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST) == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE,
                 "keyboard resizing is retained");
         check(((android.graphics.drawable.ColorDrawable) window.getDecorView().getBackground()).getColor() == Color.BLACK,
                 "settings window has an opaque background");
-        System.out.println("PASS replay touch routing and settings window cutout policy");
+        SettingsWindowProbe.verify(context);
+        System.out.println("PASS replay touch routing and live settings-window system bars, cutout, rotation and lifecycle");
     }
 
     private static void dispatch(TextView view, int action, float x, float y) {

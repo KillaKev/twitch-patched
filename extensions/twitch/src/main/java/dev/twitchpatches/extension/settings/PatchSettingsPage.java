@@ -23,6 +23,7 @@ public final class PatchSettingsPage extends DialogFragment {
     private Toolbar toolbar;
     private SearchView search;
     private boolean restoringSearch;
+    private AutoCloseable windowSubscription;
 
     static PatchSettingsPage forGroup(String key) {
         PatchSettingsPage page = new PatchSettingsPage();
@@ -157,7 +158,16 @@ public final class PatchSettingsPage extends DialogFragment {
         if (dialog == null || getActivity() == null) return;
         Window window = dialog.getWindow();
         if (window == null) return;
-        SettingsWindow.configure(window, TwitchSettingsResources.color(getActivity(), "background_body"));
+        windowSubscription = SettingsWindow.bind(window, TwitchSettingsResources.color(getActivity(), "background_body"));
+    }
+
+    @Override public void onStop() {
+        if (windowSubscription != null) {
+            try { windowSubscription.close(); }
+            catch (Exception error) { android.util.Log.w("TwitchPatchesSettings", "Window subscription cleanup failed"); }
+            windowSubscription = null;
+        }
+        super.onStop();
     }
 
     private void syncSearch() {
