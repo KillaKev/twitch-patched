@@ -19,7 +19,6 @@ import java.util.Map;
 
 public final class UiFullscreenWindowProbe {
     private static final String PREFIX = "dev.twitchpatches.extension.ui.";
-
     public static void main(String[] args) throws Exception {
         try { run(); }
         catch (Throwable error) { error.printStackTrace(); System.exit(1); }
@@ -33,6 +32,7 @@ public final class UiFullscreenWindowProbe {
         Configuration configuration = new Configuration(context.getResources().getConfiguration());
         configuration.orientation = Configuration.ORIENTATION_LANDSCAPE;
         Context themed = new ContextThemeWrapper(context.createConfigurationContext(configuration), android.R.style.Theme_Material);
+        UiFullscreenViewportProbe.verify(themed);
         Window window = new ProbeWindow(themed);
         ProbeActivity activity = new ProbeActivity(window, themed);
 

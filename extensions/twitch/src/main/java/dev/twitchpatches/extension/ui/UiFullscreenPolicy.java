@@ -64,6 +64,8 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
 
     private static final class Session implements android.view.ViewTreeObserver.OnGlobalLayoutListener {
         private final WeakReference<Activity> reference;
+        private final int containerId;
+        private final int presenterId;
         private WeakReference<View> container = new WeakReference<>(null);
         private AutoCloseable subscription;
         private final UiSystemBars bars = new UiSystemBars();
@@ -72,7 +74,11 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
         private boolean hideStatus;
         private boolean hideNavigation;
 
-        Session(Activity activity) { reference = new WeakReference<>(activity); }
+        Session(Activity activity) {
+            reference = new WeakReference<>(activity);
+            containerId = activity.getResources().getIdentifier("fullscreen_layout", "id", activity.getPackageName());
+            presenterId = activity.getResources().getIdentifier("video_presenter_container", "id", activity.getPackageName());
+        }
 
         void start() {
             Activity activity = reference.get();
@@ -115,7 +121,7 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
             Window window = activity.getWindow();
             player |= (window.getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0 ||
                     (bars.hostFlags(window.getDecorView().getSystemUiVisibility()) & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-            return landscape && player;
+            return landscape && (player || UiFullscreenViewport.covers(container(activity), presenterId));
         }
 
         private void apply(Window window, boolean status, boolean navigation) {
@@ -144,16 +150,21 @@ final class UiFullscreenPolicy implements Application.ActivityLifecycleCallbacks
         }
 
         private void refreshInsets() {
-            View view = container.get();
             Activity activity = reference.get();
-            if (view == null && activity != null) {
-                int id = activity.getResources().getIdentifier("fullscreen_layout", "id", activity.getPackageName());
-                if (id != 0) view = activity.getWindow().getDecorView().findViewById(id);
-            }
+            View view = activity == null ? null : container(activity);
             if (view == null || !view.isAttachedToWindow()) return;
             WindowInsets insets = view.getRootWindowInsets();
             // Preference changes can leave the window insets unchanged while Twitch retains old padding.
             if (insets != null) view.dispatchApplyWindowInsets(insets);
+        }
+
+        private View container(Activity activity) {
+            View view = container.get();
+            if ((view == null || !view.isAttachedToWindow()) && containerId != 0) {
+                view = activity.getWindow().getDecorView().findViewById(containerId);
+                container = new WeakReference<>(view);
+            }
+            return view;
         }
     }
 }
