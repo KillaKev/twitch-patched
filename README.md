@@ -20,6 +20,7 @@ Patch settings include search, emote provider controls and UI customization. Gro
 | Auto-claim bonus channel points | Automatically claims bonus channel points while watching live streams. |
 | BTTV, FFZ and 7TV emotes | Adds global and channel emotes to live chat, replay chat and the emote picker, with animations and tap previews. |
 | Reload stream | Reloads live streams with a double-tap control. |
+| Show deleted messages | Turns deleted or moderated chat messages into a tappable spoiler that reveals the original text. |
 | UI settings | Controls the visibility of player buttons, channel actions, extensions and fullscreen system bars. |
 | Block client-requested ads | Blocks native player ad requests. Restart Twitch after changing this setting. |
 | Playback diagnostics | Records playlist metadata and playback counters for troubleshooting. |
