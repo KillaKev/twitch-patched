@@ -17,7 +17,15 @@ internal class MetroExports(private val bundle: HermesBundle) {
 
     fun requireFunctionContract(name: String, params: Int, properties: Set<String>) {
         val function = bundle.functions.single { bundle.strings[it.name] == name && it.params == params }
-        require(descendants(function).containsAll(properties)) { "Modern Twitch: $name parser contract changed." }
+        val symbols = descendants(function)
+        if (symbols.containsAll(properties)) return
+        // Twitch 31.7 turned BottomSheet into a dispatcher over NativeBottomSheet and RNBottomSheet.
+        val delegates = symbols.filter { it != name && it.endsWith(name) }.mapNotNull { delegate ->
+            bundle.functions.singleOrNull { bundle.strings[it.name] == delegate && it.params == params }
+        }
+        require(delegates.isNotEmpty() && delegates.all { descendants(it).containsAll(properties) }) {
+            "Modern Twitch: $name parser contract changed."
+        }
     }
 
     private fun descendants(root: HermesBundle.Function): Set<String> {

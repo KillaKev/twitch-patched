@@ -14,6 +14,11 @@ object TwitchTarget {
         apkFileType = ApkFileType.APKM,
         targets = listOf(
             AppTarget(
+                version = "31.7.0",
+                isExperimental = false,
+                description = "Tested on ARM64 with native and swipe-feed players.",
+            ),
+            AppTarget(
                 version = BASELINE_VERSION,
                 isExperimental = false,
                 description = "Tested on ARM64 with native and swipe-feed players.",
