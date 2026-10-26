@@ -14,9 +14,12 @@ internal fun renderUiControls(bundle: HermesBundle): String {
     val support = exports.resolve("SupportActionRow", setOf("buttons", "expanded", "compact", "onOpenSubscribe"))
     val skylineSupport = if (bundle.functions.any { bundle.strings[it.name] == "SkylineSupportActionRow" })
         exports.resolve("SkylineSupportActionRow", setOf("buttons", "expanded", "compact", "onOpenSubscribe")) else support
-    val leaderboard = if (bundle.functions.any { bundle.strings[it.name] == "SkylineLeaderboardTrophy" }) {
-        exports.requireFunctionContract("SkylineLeaderboardTrophy", 1, setOf("skyline-leaderboard-trophy", "openSheetOnBoard"))
-        exports.resolve("SkylineLeaderboardTrophy", setOf("useChannelLeaderboard", "hasBoards", "IconButton"), params = 1)
+    // Twitch 31.7 added a props parameter to SkylineLeaderboardTrophy; only its identity is used.
+    val trophy = bundle.functions.filter { bundle.strings[it.name] == "SkylineLeaderboardTrophy" }
+    val leaderboard = if (trophy.isNotEmpty()) {
+        val params = trophy.single().params
+        exports.requireFunctionContract("SkylineLeaderboardTrophy", params, setOf("skyline-leaderboard-trophy", "openSheetOnBoard"))
+        exports.resolve("SkylineLeaderboardTrophy", setOf("useChannelLeaderboard", "hasBoards", "IconButton"), params = params)
     } else null
     val targets = mapOf(
         "CLASSIC" to exports.resolve("PlayerControlsOverlay", setOf("onMuteToggle", "visible", "IconButton", "Tooltip")),
