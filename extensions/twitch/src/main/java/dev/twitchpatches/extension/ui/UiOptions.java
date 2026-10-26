@@ -64,7 +64,7 @@ final class UiOptions {
         return new SettingGroup() {
             @Override public String key() { return "ui_" + key; }
             @Override public String title() { return title; }
-            @Override public String summary() { return description; }
+            @Override public String summary() { return description.isEmpty() ? master.summary() : description + " " + master.summary(); }
             @Override public SettingSection section() { return section; }
             @Override public String icon() { return icon; }
             @Override public List<? extends SettingEntry> children() { return entries; }
