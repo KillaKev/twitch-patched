@@ -108,6 +108,7 @@ internal fun BytecodePatchContext.injectUiComposition() {
     owner.methods.add(row)
     replaceNativeUiCalls(contract.actionCallers.getValue(contract.classicRow.renderer.reference), contract.classicRow.renderer.reference, row)
     injectClassicHeader(all, owner, contract.classicRow)
+    injectMetadataActions(all, owner, contract)
 }
 
 internal fun uiWrapper(original: Method, name: String, contract: UiCompositionContract, condition: String): app.morphe.patcher.util.proxy.mutableTypes.MutableMethod {

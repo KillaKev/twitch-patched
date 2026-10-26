@@ -28,6 +28,7 @@ internal fun ResourcePatchContext.prepareUiViewResources() {
         "player_control_overlay_widget" to mapOf("create_clip_button_compose_view" to "classic_controls_hide_clip",
             "media_route_button" to "classic_controls_hide_cast", "share_button" to "classic_controls_hide_share"),
         "profile_card_no_divider" to mapOf("subscribe_button" to "classic_support_hide_subscribe"),
+        "follow_subscribe_button_view" to mapOf("sub_button_container" to "classic_support_hide_subscribe"),
         "one_chat_layout" to mapOf("bits_button" to "classic_support_hide_bits"),
         "player_metadata_view_extended" to mapOf("extended_subscribe_button_container" to "classic_support_hide_subscribe"),
         "bottom_player_control_overlay_widget" to mapOf("subscribe_button_container" to "classic_support_hide_subscribe"),
