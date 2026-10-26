@@ -46,5 +46,5 @@ internal fun renderUiControls(bundle: HermesBundle): String {
         .replace("__TWITCH_UI_EXTENSION_ENTRY_MODULE__", extensionEntry?.module?.toString() ?: "null")
         .replace("__TWITCH_UI_SKYLINE_ROW_EXPORT__", skylineSupport.name)
     targets.forEach { (key, target) -> source = source.replace("__TWITCH_UI_${key}_MODULE__", target.module.toString()) }
-    return source
+    return source + "\n" + renderUiChatOverlays(bundle)
 }
