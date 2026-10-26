@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import dev.twitchpatches.extension.settings.PatchSettings;
 import dev.twitchpatches.extension.settings.SettingSection;
 import dev.twitchpatches.extension.settings.ToggleSetting;
+import dev.twitchpatches.extension.shared.ReactNativeRuntime;
 
 public final class DeletedMessageSettings {
     private static volatile boolean enabled;
@@ -14,6 +15,7 @@ public final class DeletedMessageSettings {
         if (preferences != null) return;
         preferences = application.getSharedPreferences("twitch_patches_deleted_messages", 0);
         enabled = preferences.getBoolean("show_deleted_messages", true);
+        ReactNativeRuntime.select(8);
         PatchSettings.register(new ToggleSetting() {
             @Override public String key() { return "show_deleted_messages"; }
             @Override public String title() { return "Show deleted messages"; }
@@ -23,6 +25,7 @@ public final class DeletedMessageSettings {
             @Override public void setEnabled(boolean checked) {
                 enabled = checked;
                 preferences.edit().putBoolean(key(), checked).apply();
+                ReactNativeRuntime.refresh();
             }
         });
     }
